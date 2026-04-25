@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wuling CRM — Customer Database</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bg:#0a0c10;--surface:#111318;--surface2:#181c26;--surface3:#1e2230;
+  --border:#22273a;--border2:#2a3048;
+  --accent:#c8102e;--accent2:#e8a44a;--accent3:#5b8dee;
+  --text:#e8eaf0;--muted:#6b7280;
+  --danger:#e05c5c;--success:#4ec97b;--warn:#f0b429;
+  --cold:#5b8dee;--warm:#f0b429;--hot:#e05c5c;
+  --deal:#4ec97b;--lost:#6b7280;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(200,16,46,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(200,16,46,.03) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:1440px;margin:0 auto;padding:0 16px}
+
+/* ── SETUP SCREEN ── */
+#setupScreen{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;padding:24px}
+.setup-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:40px;width:100%;max-width:420px;text-align:center}
+.setup-logo{width:64px;height:64px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#a0001e);display:grid;place-items:center;font-size:28px;margin:0 auto 20px}
+.setup-card h2{font-family:'DM Serif Display',serif;font-size:1.6rem;margin-bottom:6px}
+.setup-card p{color:var(--muted);font-size:.85rem;margin-bottom:28px}
+.setup-field{text-align:left;margin-bottom:16px}
+.setup-field label{font-size:.74rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px}
+.setup-field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--text);font-family:inherit;font-size:.95rem;outline:none;transition:border-color .2s}
+.setup-field input:focus{border-color:var(--accent)}
+.setup-btn{width:100%;padding:13px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#a0001e);color:#fff;font-family:inherit;font-weight:700;font-size:.95rem;border:none;cursor:pointer;margin-top:8px;transition:opacity .2s}
+.setup-btn:hover{opacity:.9}
+
+/* ── HEADER ── */
+header{border-bottom:1px solid var(--border);padding:12px 0;backdrop-filter:blur(14px);background:rgba(10,12,16,.9);position:sticky;top:0;z-index:100}
+.hi{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.bl{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#a0001e);display:grid;place-items:center;font-size:14px}
+.brand h1{font-family:'DM Serif Display',serif;font-size:1.15rem;letter-spacing:-.02em}
+.brand span{color:var(--muted);font-size:.7rem;display:block;margin-top:-1px}
+.ha{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+/* Hamburger menu button - only shows on small screens */
+.menu-btn{display:none;width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;color:var(--text);font-size:1.1rem;align-items:center;justify-content:center;flex-shrink:0}
+/* Dropdown menu for mobile */
+.ha-dropdown{display:none;position:absolute;top:58px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px;z-index:200;min-width:200px;box-shadow:0 8px 32px rgba(0,0,0,.4);flex-direction:column;gap:4px}
+.ha-dropdown.open{display:flex}
+.ha-dropdown .btn{width:100%;justify-content:flex-start;border-radius:8px}
+.user-chip{display:flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px 5px 7px;font-size:.78rem;cursor:pointer;transition:border-color .2s;flex-shrink:0}
+.user-chip:hover{border-color:var(--accent2)}
+.user-avatar{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:grid;place-items:center;font-size:.65rem;font-weight:700;color:#000}
+
+/* ── TABS NAV ── */
+.main-tabs{display:flex;gap:4px;padding:14px 0 0;border-bottom:1px solid var(--border);margin-bottom:16px}
+.mtab{padding:9px 18px;font-size:.82rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .18s;border-radius:4px 4px 0 0}
+.mtab:hover{color:var(--text)}
+.mtab.active{color:var(--accent);border-bottom-color:var(--accent);background:rgba(200,16,46,.06)}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:16px}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 13px;position:relative;overflow:hidden;transition:transform .18s}
+.sc:hover{transform:translateY(-2px)}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:10px 10px 0 0}
+.sc.all::before{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.sc.cold::before{background:var(--cold)}.sc.warm::before{background:var(--warm)}
+.sc.hot::before{background:var(--hot)}.sc.deal::before{background:var(--deal)}.sc.lost::before{background:var(--lost)}
+.sl{font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+.sn{font-family:'DM Serif Display',serif;font-size:1.6rem;line-height:1}
+.sc.all .sn{color:var(--accent2)}.sc.cold .sn{color:var(--cold)}.sc.warm .sn{color:var(--warm)}
+.sc.hot .sn{color:var(--hot)}.sc.deal .sn{color:var(--deal)}.sc.lost .sn{color:var(--lost)}
+
+/* ── WARN BANNER ── */
+.wbanner{background:rgba(240,180,41,.09);border:1px solid rgba(240,180,41,.3);border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:9px;margin-bottom:12px;font-size:.82rem}
+.wbanner strong{color:var(--warn)}.wbanner .xb{margin-left:auto;cursor:pointer;color:var(--muted);font-size:.9rem}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.sbox{flex:1;min-width:180px;background:var(--surface);border:1px solid var(--border);border-radius:9px;display:flex;align-items:center;gap:7px;padding:0 11px}
+.sbox input{background:none;border:none;outline:none;color:var(--text);font-family:inherit;font-size:.85rem;padding:9px 0;flex:1}
+.sbox input::placeholder{color:var(--muted)}
+.ftabs{display:flex;gap:4px;flex-wrap:wrap}
+.ft{padding:6px 11px;border-radius:7px;font-size:.75rem;font-weight:500;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;transition:all .16s}
+.ft:hover{color:var(--text);border-color:var(--accent2)}
+.ft.active.all{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
+.ft.active.cold{background:var(--cold);color:#fff;border-color:transparent}
+.ft.active.warm{background:var(--warm);color:#000;border-color:transparent}
+.ft.active.hot{background:var(--hot);color:#fff;border-color:transparent}
+
+.btn{padding:8px 13px;border-radius:8px;font-size:.79rem;font-weight:600;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .16s;white-space:nowrap;font-family:inherit}
+.btn-p{background:linear-gradient(135deg,var(--accent),#a0001e);color:#fff}.btn-p:hover{opacity:.88;transform:translateY(-1px)}
+.btn-g{background:var(--surface);border:1px solid var(--border);color:var(--text)}.btn-g:hover{border-color:var(--accent2)}
+
+/* ── TABLE ── */
+.tw{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px}
+.sh{font-size:.7rem;color:var(--muted);padding:7px 14px 4px;text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:5px;border-bottom:1px solid var(--border)}
+.sh::before{content:'';display:block;width:18px;height:4px;border-radius:2px;background:var(--border2)}
+.tsc{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%}
+.tsc::-webkit-scrollbar{height:6px}
+.tsc::-webkit-scrollbar-track{background:var(--surface2)}
+.tsc::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.tsc::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+table{width:100%;min-width:900px;border-collapse:collapse;font-size:.81rem}
+thead{background:var(--surface2)}
+thead th{padding:10px 12px;text-align:left;font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;white-space:nowrap}
+/* No more sticky — let everything scroll naturally */
+tbody tr{border-top:1px solid var(--border);transition:background .12s}
+tbody tr:hover{background:var(--surface2)}
+tbody td{padding:9px 12px;vertical-align:middle;white-space:nowrap}
+.tn{font-weight:600;font-size:.85rem;white-space:normal}
+.ts{color:var(--muted);font-size:.73rem;margin-top:1px}
+.acts{display:flex;gap:4px;flex-wrap:nowrap;align-items:center}
+.bs{width:30px;height:30px;border-radius:6px;font-size:.84rem;border:1px solid var(--border);background:none;cursor:pointer;color:var(--muted);transition:all .14s;display:grid;place-items:center;flex-shrink:0}
+.bs:hover.wa{border-color:#25d366;color:#25d366;background:rgba(37,211,102,.1)}
+.bs:hover.cp{border-color:var(--accent3);color:var(--accent3);background:rgba(91,141,238,.1)}
+.bs:hover.fu{border-color:var(--warn);color:var(--warn);background:rgba(240,180,41,.1)}
+.bs:hover.ed{border-color:var(--accent2);color:var(--accent2);background:rgba(232,164,74,.1)}
+.bs:hover.dl{border-color:var(--danger);color:var(--danger);background:rgba(224,92,92,.1)}
+.bs-deal{background:rgba(78,201,123,.12);border:1px solid rgba(78,201,123,.3);color:var(--deal);font-size:.68rem;font-weight:700;padding:0 8px;height:28px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .14s;font-family:inherit;flex-shrink:0}
+.bs-deal:hover{background:rgba(78,201,123,.25)}
+.bs-lost{background:rgba(107,114,128,.12);border:1px solid rgba(107,114,128,.3);color:var(--lost);font-size:.68rem;font-weight:700;padding:0 8px;height:28px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .14s;font-family:inherit;flex-shrink:0}
+.bs-lost:hover{background:rgba(107,114,128,.25)}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 7px;border-radius:5px;font-size:.67rem;font-weight:600;white-space:nowrap}
+.badge.database{background:rgba(91,141,238,.15);color:#7ba7f5;border:1px solid rgba(91,141,238,.3)}
+.badge.referensi{background:rgba(78,201,123,.15);color:var(--deal);border:1px solid rgba(78,201,123,.3)}
+.badge.pameran{background:rgba(232,164,74,.15);color:var(--accent2);border:1px solid rgba(232,164,74,.3)}
+.badge.bigevent{background:rgba(200,16,46,.15);color:#ff6b80;border:1px solid rgba(200,16,46,.3)}
+.badge.iklan{background:rgba(196,91,224,.15);color:#d47bf0;border:1px solid rgba(196,91,224,.3)}
+.badge.web{background:rgba(91,200,238,.15);color:#5bdce8;border:1px solid rgba(91,200,238,.3)}
+.badge.sosmed{background:rgba(240,100,180,.15);color:#f06bb4;border:1px solid rgba(240,100,180,.3)}
+.badge.custom-src{background:rgba(107,114,128,.15);color:#9ca3af;border:1px solid rgba(107,114,128,.3)}
+.badge.cold{background:rgba(91,141,238,.15);color:var(--cold);border:1px solid rgba(91,141,238,.3)}
+.badge.warm{background:rgba(240,180,41,.15);color:var(--warm);border:1px solid rgba(240,180,41,.3)}
+.badge.hot{background:rgba(224,92,92,.15);color:var(--hot);border:1px solid rgba(224,92,92,.3)}
+.badge.deal{background:rgba(78,201,123,.15);color:var(--deal);border:1px solid rgba(78,201,123,.3)}
+.badge.lost{background:rgba(107,114,128,.15);color:var(--lost);border:1px solid rgba(107,114,128,.3)}
+.badge.wf{background:rgba(240,180,41,.2);color:var(--warn);border:1px solid rgba(240,180,41,.5);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+.fudots{display:flex;gap:3px}
+.fudot{width:8px;height:8px;border-radius:50%}
+.fudot.done{background:var(--deal)}.fudot.nr{background:var(--warn)}.fudot.mt{background:var(--surface3);border:1px solid var(--border)}
+
+.empty{text-align:center;padding:44px 20px;color:var(--muted)}
+.empty .ic{font-size:2rem;margin-bottom:8px}
+.pager{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-top:1px solid var(--border);font-size:.77rem;color:var(--muted)}
+.pbtns{display:flex;gap:4px}
+.pb{width:26px;height:26px;border-radius:5px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-size:.75rem;transition:all .14s}
+.pb:hover,.pb.active{border-color:var(--accent2);color:var(--accent2)}
+
+/* ── DEAL / LOST TABLES (separate tabs) ── */
+.section-title{font-family:'DM Serif Display',serif;font-size:1.1rem;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+/* ── OVERLAYS ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(5px);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.overlay.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:100%;max-width:600px;padding:24px;animation:su .22s ease;margin:auto}
+.modal.wide{max-width:720px}
+.modal.xl{max-width:900px}
+@keyframes su{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.mttl{font-family:'DM Serif Display',serif;font-size:1.12rem}
+.mc{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-size:.85rem;transition:all .14s}
+.mc:hover{color:var(--danger);border-color:var(--danger)}
+.itabs{display:flex;gap:3px;margin-bottom:18px;border-bottom:1px solid var(--border)}
+.itab{padding:7px 13px;font-size:.79rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .16s}
+.itab.active{color:var(--accent2);border-bottom-color:var(--accent2)}
+.tp{display:none}.tp.active{display:block}
+
+/* ── FORM ── */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.f{display:flex;flex-direction:column;gap:4px}
+.f.full{grid-column:1/-1}
+.f label{font-size:.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.f input,.f select,.f textarea{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:9px 11px;font-family:inherit;font-size:.86rem;color:var(--text);outline:none;transition:border-color .2s}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--accent2)}
+.f select option{background:var(--surface2)}
+.f textarea{resize:vertical;min-height:54px}
+
+/* ── BRAND & PRODUCT ── */
+.brand-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:4px}
+.bopt{padding:10px 6px;border-radius:9px;text-align:center;border:1.5px solid var(--border);cursor:pointer;transition:all .16s}
+.bopt:hover{border-color:var(--accent2);transform:translateY(-1px)}
+.bopt.sel{border-color:var(--accent2);box-shadow:0 0 0 1px var(--accent2)}
+.bopt .blog{width:40px;height:40px;border-radius:9px;margin:0 auto 5px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;letter-spacing:-.02em}
+.bopt .bnm{font-size:.67rem;font-weight:600;color:var(--muted)}
+.bopt.sel .bnm{color:var(--text)}
+.blog-wuling{background:linear-gradient(135deg,#c8102e,#8b0018);color:#fff}
+.blog-mg{background:linear-gradient(135deg,#cc0000,#880000);color:#fff}
+.blog-geely{background:linear-gradient(135deg,#003087,#001a5c);color:#fff}
+.blog-hyundai{background:linear-gradient(135deg,#002c5f,#001830);color:#c8a951}
+.blog-mazda{background:linear-gradient(135deg,#1a1a1a,#555);color:#fff}
+.blog-jetour{background:linear-gradient(135deg,#00923f,#005c27);color:#fff}
+.blog-gwm{background:linear-gradient(135deg,#e30613,#9e0000);color:#fff}
+.blog-custom{background:linear-gradient(135deg,#374151,#1f2937);color:#9ca3af}
+/* Brand pill in table */
+.brand-pill{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.bico{width:20px;height:20px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:800;flex-shrink:0}
+/* Product list inside form */
+.prod-panel{margin-top:9px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
+.prod-panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.prod-panel-lbl{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.prod-list{display:flex;flex-wrap:wrap;gap:5px;min-height:32px}
+.prodopt{padding:5px 10px;border-radius:6px;font-size:.76rem;font-weight:500;border:1px solid var(--border);cursor:pointer;transition:all .14s;color:var(--muted);background:var(--surface);font-family:inherit;display:inline-flex;align-items:center;gap:5px}
+.prodopt:hover{border-color:var(--accent2);color:var(--text)}
+.prodopt.sel{border-color:var(--accent2);background:rgba(232,164,74,.12);color:var(--accent2);font-weight:600}
+.prodopt .xp{color:var(--muted);font-size:.65rem;margin-left:2px;cursor:pointer;transition:color .13s;flex-shrink:0}
+.prodopt .xp:hover{color:var(--danger)}
+.prod-add-row{display:flex;gap:6px;margin-top:9px;padding-top:9px;border-top:1px solid var(--border)}
+.prod-add-row input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:inherit;font-size:.81rem;color:var(--text);outline:none;transition:border-color .2s}
+.prod-add-row input:focus{border-color:var(--accent2)}
+.prod-add-row button{padding:7px 12px;border-radius:7px;background:rgba(232,164,74,.13);border:1px solid rgba(232,164,74,.3);color:var(--accent2);font-family:inherit;font-size:.77rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .14s}
+.prod-add-row button:hover{background:rgba(232,164,74,.24)}
+.no-prod{font-size:.78rem;color:var(--muted);padding:6px 0}
+/* Source grid */
+.srcgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:3px}
+.sopt{padding:8px 5px;border-radius:7px;text-align:center;border:1.5px solid var(--border);cursor:pointer;transition:all .16s;font-size:.7rem;font-weight:600;color:var(--muted)}
+.sopt span{display:block;font-size:.95rem;margin-bottom:2px}
+.sopt.database:hover,.sopt.database.sel{border-color:#7ba7f5;background:rgba(91,141,238,.1);color:#7ba7f5}
+.sopt.referensi:hover,.sopt.referensi.sel{border-color:var(--deal);background:rgba(78,201,123,.1);color:var(--deal)}
+.sopt.pameran:hover,.sopt.pameran.sel{border-color:var(--accent2);background:rgba(232,164,74,.1);color:var(--accent2)}
+.sopt.bigevent:hover,.sopt.bigevent.sel{border-color:#ff6b80;background:rgba(200,16,46,.1);color:#ff6b80}
+.sopt.iklan:hover,.sopt.iklan.sel{border-color:#d47bf0;background:rgba(196,91,224,.1);color:#d47bf0}
+.sopt.web:hover,.sopt.web.sel{border-color:#5bdce8;background:rgba(91,200,238,.1);color:#5bdce8}
+.sopt.sosmed:hover,.sopt.sosmed.sel{border-color:#f06bb4;background:rgba(240,100,180,.1);color:#f06bb4}
+.sopt.custom-src:hover,.sopt.custom-src.sel{border-color:#9ca3af;background:rgba(107,114,128,.1);color:#9ca3af}
+/* Big Event sub-panel */
+.bigevent-panel{display:none;grid-column:1/-1;background:rgba(200,16,46,.06);border:1px solid rgba(200,16,46,.2);border-radius:9px;padding:12px 14px;margin-top:2px}
+.bigevent-panel.show{display:block}
+.bigevent-panel .bp-label{font-size:.68rem;color:#ff6b80;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.be-opts{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px}
+.beopt{padding:5px 12px;border-radius:6px;font-size:.75rem;font-weight:600;border:1.5px solid rgba(200,16,46,.3);cursor:pointer;transition:all .15s;color:#ff6b80;background:none}
+.beopt:hover,.beopt.sel{background:rgba(200,16,46,.15);border-color:#ff6b80}
+.be-custom-row{display:none;margin-top:6px}
+.be-custom-row.show{display:flex;gap:7px;align-items:center}
+.be-custom-row input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:inherit;font-size:.82rem;color:var(--text);outline:none;transition:border-color .2s}
+.be-custom-row input:focus{border-color:#ff6b80}
+.be-custom-row button{padding:7px 12px;border-radius:7px;background:rgba(200,16,46,.15);border:1px solid rgba(200,16,46,.3);color:#ff6b80;font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+.be-custom-row button:hover{background:rgba(200,16,46,.25)}
+/* Custom source new panel */
+.custom-src-panel{display:none;grid-column:1/-1;background:rgba(107,114,128,.06);border:1px solid rgba(107,114,128,.2);border-radius:9px;padding:12px 14px;margin-top:2px}
+.custom-src-panel.show{display:block}
+.custom-src-panel .cp-label{font-size:.68rem;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.cs-row{display:flex;gap:7px;align-items:center}
+.cs-row input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:inherit;font-size:.82rem;color:var(--text);outline:none;transition:border-color .2s}
+.cs-row input:focus{border-color:#9ca3af}
+.cs-row button{padding:7px 12px;border-radius:7px;background:rgba(107,114,128,.15);border:1px solid rgba(107,114,128,.3);color:#9ca3af;font-family:inherit;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+.cs-row button:hover{background:rgba(107,114,128,.25)}
+.saved-srcs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+/* Status grid */
+.stgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:3px}
+.stopt{padding:8px 5px;border-radius:7px;text-align:center;border:1.5px solid var(--border);cursor:pointer;transition:all .16s;font-size:.7rem;font-weight:600;color:var(--muted)}
+.stopt span{display:block;font-size:.95rem;margin-bottom:2px}
+.stopt.cold:hover,.stopt.cold.sel{border-color:var(--cold);background:rgba(91,141,238,.1);color:var(--cold)}
+.stopt.warm:hover,.stopt.warm.sel{border-color:var(--warm);background:rgba(240,180,41,.1);color:var(--warm)}
+.stopt.hot:hover,.stopt.hot.sel{border-color:var(--hot);background:rgba(224,92,92,.1);color:var(--hot)}
+/* Panggilan grid */
+.panggrid{display:flex;gap:6px;margin-top:3px;flex-wrap:wrap}
+.pangopt{padding:7px 16px;border-radius:7px;border:1.5px solid var(--border);cursor:pointer;transition:all .16s;font-size:.8rem;font-weight:600;color:var(--muted)}
+.pangopt:hover{border-color:var(--accent2);color:var(--accent2)}
+.pangopt.sel{border-color:var(--accent2);background:rgba(232,164,74,.12);color:var(--accent2)}
+
+.ma{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.bcn{padding:8px 15px;border-radius:7px;background:none;border:1px solid var(--border);color:var(--muted);font-family:inherit;font-size:.82rem;cursor:pointer;transition:border-color .2s}
+.bcn:hover{border-color:var(--text);color:var(--text)}
+.bsv{padding:8px 20px;border-radius:7px;background:linear-gradient(135deg,var(--accent),#a0001e);color:#fff;border:none;font-family:inherit;font-weight:700;font-size:.82rem;cursor:pointer;transition:opacity .2s}
+.bsv:hover{opacity:.88}
+
+/* ── FOLLOW UP ── */
+.ful{display:flex;flex-direction:column;gap:9px;margin-top:3px}
+.fui{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
+.fuih{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.fun{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.furr{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}
+.furo{padding:4px 8px;border-radius:5px;font-size:.69rem;font-weight:600;border:1px solid var(--border);cursor:pointer;transition:all .13s;color:var(--muted)}
+.furo.sel.responded{border-color:var(--deal);background:rgba(78,201,123,.13);color:var(--deal)}
+.furo.sel.noresponse{border-color:var(--warn);background:rgba(240,180,41,.13);color:var(--warn)}
+.furo.sel.interested{border-color:var(--hot);background:rgba(224,92,92,.13);color:var(--hot)}
+.furo.sel.notinterested{border-color:var(--muted);background:rgba(107,114,128,.13);color:var(--muted)}
+.furo.sel.callback{border-color:var(--accent3);background:rgba(91,141,238,.13);color:var(--accent3)}
+.furo.sel.deal{border-color:var(--deal);background:rgba(78,201,123,.2);color:var(--deal)}
+.funi{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:7px 9px;font-family:inherit;font-size:.79rem;color:var(--text);outline:none;resize:none;min-height:44px;transition:border-color .2s}
+.funi:focus{border-color:var(--accent2)}
+.fuadd{margin-top:9px;width:100%;padding:8px;border-radius:7px;background:var(--surface2);border:1px dashed var(--border2);color:var(--muted);cursor:pointer;font-family:inherit;font-size:.79rem;transition:all .16s}
+.fuadd:hover{border-color:var(--accent3);color:var(--accent3)}
+.fuwarn{background:rgba(240,180,41,.1);border:1px solid rgba(240,180,41,.35);border-radius:8px;padding:10px 12px;margin-top:10px;font-size:.79rem;color:var(--warn)}
+
+/* ── WA ── */
+.copanel{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:13px;margin-top:10px}
+.coprev{font-size:.8rem;line-height:1.75;color:var(--text);white-space:pre-wrap;word-break:break-word;min-height:88px}
+.coa{display:flex;gap:6px;margin-top:11px;flex-wrap:wrap}
+.bwa{background:rgba(37,211,102,.13);border:1px solid rgba(37,211,102,.32);color:#25d366;padding:7px 13px;border-radius:7px;font-size:.79rem;font-weight:600;cursor:pointer;font-family:inherit;transition:background .16s;display:inline-flex;align-items:center;gap:5px}
+.bwa:hover{background:rgba(37,211,102,.22)}
+.bcp{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 13px;border-radius:7px;font-size:.79rem;font-weight:500;cursor:pointer;font-family:inherit;transition:border-color .16s;display:inline-flex;align-items:center;gap:5px}
+.bcp:hover{border-color:var(--accent3)}
+
+/* ── IMPORT ── */
+.impz{border:2px dashed var(--border2);border-radius:11px;padding:28px;text-align:center;cursor:pointer;transition:all .18s;color:var(--muted)}
+.impz:hover,.impz.drag{border-color:var(--accent3);background:rgba(91,141,238,.04);color:var(--text)}
+.impz input{display:none}
+
+/* ── REPORT ── */
+.rep-filter{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:13px 16px}
+.rep-filter label{font-size:.72rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.rep-filter select,.rep-filter input{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-family:inherit;font-size:.83rem;outline:none}
+.rs{margin-bottom:20px}
+.rt{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:9px;display:flex;align-items:center;gap:6px}
+.rg{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:4px}
+.rc{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:12px}
+.rc .rnum{font-family:'DM Serif Display',serif;font-size:1.6rem;line-height:1}
+.rc .rlbl{font-size:.68rem;color:var(--muted);margin-top:2px}
+.rtbl{width:100%;border-collapse:collapse;font-size:.79rem}
+.rtbl th{padding:7px 11px;background:var(--surface2);text-align:left;font-size:.65rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.rtbl td{padding:7px 11px;border-top:1px solid var(--border)}
+.rtbl tr:hover td{background:var(--surface2)}
+.pbar{height:5px;border-radius:3px;background:var(--surface3);overflow:hidden;margin-top:4px}
+.pfill{height:100%;border-radius:3px;transition:width .5s ease}
+.rep-tabs{display:flex;gap:4px;margin-bottom:16px}
+.rtab{padding:7px 14px;border-radius:7px;font-size:.79rem;font-weight:500;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;transition:all .16s}
+.rtab.active{background:var(--accent2);color:#000;border-color:var(--accent2)}
+.rep-xl-btn{background:linear-gradient(135deg,#217346,#1a5c37);color:#fff;padding:8px 16px;border-radius:8px;border:none;font-family:inherit;font-size:.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:opacity .18s}
+.rep-xl-btn:hover{opacity:.88}
+.rep-pdf-btn{background:linear-gradient(135deg,#c8102e,#a0001e);color:#fff;padding:8px 16px;border-radius:8px;border:none;font-family:inherit;font-size:.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:opacity .18s}
+.rep-pdf-btn:hover{opacity:.88}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:18px;right:18px;z-index:400;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 15px;font-size:.82rem;display:flex;align-items:center;gap:7px;transform:translateY(70px);opacity:0;transition:all .28s ease;box-shadow:0 8px 28px rgba(0,0,0,.45);max-width:300px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:var(--deal)}.toast.danger{border-color:var(--danger)}.toast.warn{border-color:var(--warn)}
+
+/* ── PRINT (for PDF via browser) ── */
+@media print{
+  body{background:#fff;color:#000}body::before,header,.toolbar,.ftabs,.btn,.bs,.bs-deal,.bs-lost,.pager,.toast,.overlay,.ha,.main-tabs,#setupScreen{display:none!important}
+  .stats{grid-template-columns:repeat(3,1fr)}.sc{background:#f5f5f5;border:1px solid #ddd}.sl,.sn{color:#000!important}
+  thead{background:#eee!important}.badge{border:1px solid #aaa}
+  .phdr{display:block!important}.wrap{max-width:100%;padding:10px}
+  table{min-width:unset!important}.tsc{overflow:visible}
+}
+.phdr{display:none;text-align:center;padding:16px 0;border-bottom:2px solid #000;margin-bottom:16px}
+.phdr h2{font-size:1.3rem;font-family:serif}.phdr p{font-size:.8rem;color:#555;margin-top:2px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){.stats{grid-template-columns:repeat(3,1fr)}}
+
+/* Tablet / HP Fold unfolded (~600-900px) — show hamburger, hide some buttons */
+@media(max-width:860px){
+  .ha-item{display:none!important}
+  .menu-btn{display:flex!important}
+  .ha-add-btn{display:inline-flex!important}
+  .ha-user{display:flex!important}
+  .stats{grid-template-columns:repeat(3,1fr)}
+}
+
+@media(max-width:780px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .fg{grid-template-columns:1fr}
+  .srcgrid{grid-template-columns:repeat(2,1fr)}
+  .stgrid{grid-template-columns:repeat(3,1fr)}
+  .brand-grid{grid-template-columns:repeat(4,1fr)}
+  .rg{grid-template-columns:repeat(2,1fr)}
+  table{min-width:900px}
+}
+
+@media(max-width:520px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .brand-grid{grid-template-columns:repeat(4,1fr)}
+  .brand span{display:none}
+  table{min-width:900px}
+}
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setupScreen">
+<div class="setup-card">
+  <div class="setup-logo">🚗</div>
+  <h2>Wuling CRM</h2>
+  <p>Selamat datang! Masukkan informasi Anda untuk memulai.</p>
+  <div class="setup-field"><label>Nama Sales</label><input type="text" id="setupName" placeholder="Contoh: Andi Pratama" autocomplete="name"></div>
+  <div class="setup-field"><label>Nama Dealer / Showroom</label><input type="text" id="setupDealer" placeholder="Contoh: Wuling Motors Gatsu"></div>
+  <button class="setup-btn" onclick="doSetup()">Mulai →</button>
+</div>
+</div>
+
+<div class="phdr"><h2>📊 Laporan Wuling CRM</h2><p id="phdrDate"></p></div>
+
+<header>
+<div class="wrap hi">
+  <div class="brand">
+    <div class="bl">🚗</div>
+    <div><h1>Wuling CRM</h1><span id="dealerName">Customer Database</span></div>
+  </div>
+  <!-- Full buttons (visible on wide screens) -->
+  <div class="ha" id="haButtons">
+    <button class="btn btn-g ha-item" onclick="openImport()">📥 Import</button>
+    <button class="btn btn-g ha-item" onclick="openReport()">📊 Laporan</button>
+    <button class="btn btn-g ha-item" onclick="exportCSV()">⬇ Export CSV</button>
+    <button class="btn btn-g ha-item" onclick="window.location='marketing-tools.html'">🎯 Marketing</button>
+    <button class="btn btn-p ha-item" onclick="openModal()">＋ Tambah Customer</button>
+    <div class="user-chip" onclick="editUser()">
+      <div class="user-avatar" id="uAvatar">?</div>
+      <span id="uName">Sales</span>
+    </div>
+  </div>
+  <!-- Hamburger (visible on small screens) -->
+  <div style="display:flex;align-items:center;gap:8px">
+    <button class="btn btn-p ha-add-btn" onclick="openModal()" style="display:none">＋ Tambah</button>
+    <button class="menu-btn" id="menuBtn" onclick="toggleMenu()">☰</button>
+    <div class="user-chip ha-user" onclick="editUser()" style="display:none">
+      <div class="user-avatar" id="uAvatar2">?</div>
+    </div>
+  </div>
+  <!-- Dropdown menu for small screens -->
+  <div class="ha-dropdown" id="haDropdown">
+    <button class="btn btn-g" onclick="openImport();closeMenu()">📥 Import CSV</button>
+    <button class="btn btn-g" onclick="openReport();closeMenu()">📊 Laporan</button>
+    <button class="btn btn-g" onclick="exportCSV();closeMenu()">⬇ Export CSV</button>
+    <button class="btn btn-g" onclick="window.location='marketing-tools.html'">🎯 Marketing</button>
+    <button class="btn btn-g" onclick="editUser();closeMenu()">👤 Edit Profil</button>
+  </div>
+</div>
+</header>
+
+<div class="wrap">
+
+<!-- MAIN TABS -->
+<div class="main-tabs">
+  <div class="mtab active" onclick="setMainTab('prospects',this)">📋 Prospects</div>
+  <div class="mtab" onclick="setMainTab('deal',this)">✅ Deal</div>
+  <div class="mtab" onclick="setMainTab('lost',this)">❌ Lost</div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="sc all"><div class="sl">Total Leads</div><div class="sn" id="cnt-all">0</div></div>
+  <div class="sc cold"><div class="sl">🧊 Cold</div><div class="sn" id="cnt-cold">0</div></div>
+  <div class="sc warm"><div class="sl">🌤 Warm</div><div class="sn" id="cnt-warm">0</div></div>
+  <div class="sc hot"><div class="sl">🔥 Hot</div><div class="sn" id="cnt-hot">0</div></div>
+  <div class="sc deal"><div class="sl">✅ Deal</div><div class="sn" id="cnt-deal">0</div></div>
+  <div class="sc lost"><div class="sl">❌ Lost</div><div class="sn" id="cnt-lost">0</div></div>
+</div>
+
+<!-- WARN BANNER -->
+<div id="wbanner" class="wbanner" style="display:none">
+  ⚠️ <strong id="wcnt">0</strong> customer tidak merespons 4x follow up dalam 1 minggu — pertimbangkan ubah ke <strong>Lost</strong>.
+  <span class="xb" onclick="this.parentElement.style.display='none'">✕</span>
+</div>
+
+<!-- PROSPECTS TAB -->
+<div id="tab-prospects">
+<div class="toolbar">
+  <div class="sbox"><span>🔍</span><input type="text" id="srch" placeholder="Cari nama, HP, produk..."></div>
+  <div class="ftabs" id="srcTabs">
+    <button class="ft active all" data-val="all">Semua</button>
+    <button class="ft cold" data-val="cold">🧊 Cold</button>
+    <button class="ft warm" data-val="warm">🌤 Warm</button>
+    <button class="ft hot" data-val="hot">🔥 Hot</button>
+  </div>
+</div>
+<div class="tw">
+  <div class="sh">Geser untuk melihat semua kolom & aksi →</div>
+  <div class="tsc"><table>
+    <thead><tr>
+      <th>#</th><th>Customer</th><th>Produk / Budget</th><th>Sumber</th>
+      <th>Status</th><th>Follow Up</th><th>Tgl Masuk</th><th>Aksi</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <div id="empt" class="empty" style="display:none"><div class="ic">🗂️</div><p>Belum ada data prospects.</p></div>
+  </div>
+  <div class="pager"><span id="pginfo">0 data</span><div class="pbtns" id="pbtns"></div></div>
+</div>
+</div>
+
+<!-- DEAL TAB -->
+<div id="tab-deal" style="display:none">
+<div class="section-title"><span>✅</span> Data Deal</div>
+<div class="tw">
+  <div class="tsc"><table>
+    <thead><tr><th>#</th><th>Customer</th><th>Produk / Budget</th><th>Sumber</th><th>Tgl Deal</th><th>Aksi</th></tr></thead>
+    <tbody id="tbody-deal"></tbody>
+  </table>
+  <div id="empt-deal" class="empty" style="display:none"><div class="ic">✅</div><p>Belum ada data deal.</p></div>
+  </div>
+</div>
+</div>
+
+<!-- LOST TAB -->
+<div id="tab-lost" style="display:none">
+<div class="section-title"><span>❌</span> Data Lost</div>
+<div class="tw">
+  <div class="tsc"><table>
+    <thead><tr><th>#</th><th>Customer</th><th>Produk / Budget</th><th>Sumber</th><th>Tgl Lost</th><th>Aksi</th></tr></thead>
+    <tbody id="tbody-lost"></tbody>
+  </table>
+  <div id="empt-lost" class="empty" style="display:none"><div class="ic">❌</div><p>Belum ada data lost.</p></div>
+  </div>
+</div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- ════ MODAL CUSTOMER ════ -->
+<div class="overlay" id="ovCust" onclick="obg(event,'ovCust')">
+<div class="modal wide">
+  <div class="mh"><div class="mttl" id="mtitle">Tambah Customer</div><button class="mc" onclick="co('ovCust')">✕</button></div>
+  <div class="itabs">
+    <div class="itab active" onclick="stab('tInfo',this)">📝 Info Customer</div>
+    <div class="itab" onclick="stab('tFU',this)">📞 Follow Up</div>
+    <div class="itab" onclick="stab('tWA',this)">💬 WhatsApp</div>
+  </div>
+
+  <!-- INFO -->
+  <div class="tp active" id="tInfo">
+  <div class="fg">
+    <div class="f full"><label>Panggilan *</label>
+      <div class="panggrid" id="pangGrid">
+        <div class="pangopt" onclick="selPang('Bapak',this)">👔 Bapak</div>
+        <div class="pangopt" onclick="selPang('Ibu',this)">👩 Ibu</div>
+        <div class="pangopt" onclick="selPang('Kak',this)">🙋 Kak</div>
+        <div class="pangopt" onclick="selPang('Mas',this)">🙋‍♂️ Mas</div>
+        <div class="pangopt" onclick="selPang('Mbak',this)">🙋‍♀️ Mbak</div>
+      </div>
+    </div>
+    <div class="f"><label>Nama Lengkap *</label><input type="text" id="fNm" placeholder="Budi Santoso" oninput="renderWA()"></div>
+    <div class="f"><label>No. HP / WhatsApp *</label><input type="tel" id="fPh" placeholder="08xxxxxxxxxx"></div>
+    <div class="f full"><label>Brand Mobil *</label>
+      <div class="brand-grid" id="brandGrid">
+        <div class="bopt" data-brand="Wuling" onclick="selBrand('Wuling',this)">
+          <div class="blog blog-wuling">WL</div><div class="bnm">Wuling</div>
+        </div>
+        <div class="bopt" data-brand="MG" onclick="selBrand('MG',this)">
+          <div class="blog blog-mg">MG</div><div class="bnm">MG</div>
+        </div>
+        <div class="bopt" data-brand="Geely" onclick="selBrand('Geely',this)">
+          <div class="blog blog-geely">GL</div><div class="bnm">Geely</div>
+        </div>
+        <div class="bopt" data-brand="Hyundai" onclick="selBrand('Hyundai',this)">
+          <div class="blog blog-hyundai">HY</div><div class="bnm">Hyundai</div>
+        </div>
+        <div class="bopt" data-brand="Mazda" onclick="selBrand('Mazda',this)">
+          <div class="blog blog-mazda">MZ</div><div class="bnm">Mazda</div>
+        </div>
+        <div class="bopt" data-brand="Jetour" onclick="selBrand('Jetour',this)">
+          <div class="blog blog-jetour">JT</div><div class="bnm">Jetour</div>
+        </div>
+        <div class="bopt" data-brand="GWM" onclick="selBrand('GWM',this)">
+          <div class="blog blog-gwm">GWM</div><div class="bnm">GWM</div>
+        </div>
+        <div class="bopt" data-brand="__custom__" onclick="selBrand('__custom__',this)">
+          <div class="blog blog-custom">+</div><div class="bnm">Lainnya</div>
+        </div>
+      </div>
+      <!-- Custom brand input -->
+      <div id="customBrandRow" style="display:none;margin-top:8px">
+        <div class="prod-add-row">
+          <input type="text" id="customBrandInput" placeholder="Nama brand lainnya...">
+          <button onclick="applyCustomBrand()">✓ Pilih</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="f full" id="productSection" style="display:none">
+      <label>Produk Diminati</label>
+      <div class="prod-panel">
+        <div class="prod-panel-hdr">
+          <span class="prod-panel-lbl" id="prodPanelLbl">Pilih Produk</span>
+        </div>
+        <div class="prod-list" id="prodList"></div>
+        <div class="prod-add-row">
+          <input type="text" id="prodAddInput" placeholder="Tambah produk baru...">
+          <button onclick="addProductToList()">＋ Tambah</button>
+        </div>
+      </div>
+    </div>
+    <div class="f full"><label>Budget / Rentang Harga</label>
+      <select id="fBg">
+        <option value="">— Pilih Budget —</option>
+        <option>Rp 100 jt — Rp 200 jt</option>
+        <option>Rp 200 jt — Rp 300 jt</option>
+        <option>Rp 300 jt — Rp 400 jt</option>
+        <option>Rp 400 jt — Rp 500 jt</option>
+        <option>Rp 500 jt — Rp 600 jt</option>
+        <option>Rp 600 jt — Rp 700 jt</option>
+        <option>Rp 700 jt — Rp 800 jt</option>
+        <option>Rp 800 jt — Rp 1 Miliar</option>
+        <option>> Rp 1 Miliar</option>
+      </select>
+    </div>
+    <div class="f full"><label>Sumber Leads *</label>
+      <div class="srcgrid" id="srcGrid">
+        <div class="sopt database" onclick="selSrc('database',this)"><span>🗄</span>Database</div>
+        <div class="sopt referensi" onclick="selSrc('referensi',this)"><span>🤝</span>Referensi</div>
+        <div class="sopt pameran" onclick="selSrc('pameran',this)"><span>🏛</span>Pameran</div>
+        <div class="sopt bigevent" onclick="selSrc('bigevent',this)"><span>🎪</span>Big Event</div>
+        <div class="sopt iklan" onclick="selSrc('iklan',this)"><span>📢</span>Iklan</div>
+        <div class="sopt web" onclick="selSrc('web',this)"><span>🌐</span>Website</div>
+        <div class="sopt sosmed" onclick="selSrc('sosmed',this)"><span>📱</span>Sosmed</div>
+        <div class="sopt custom-src" onclick="selSrc('custom-src',this)"><span>➕</span>Sumber Baru</div>
+      </div>
+      <!-- Big Event sub-panel -->
+      <div class="bigevent-panel" id="bigeventPanel">
+        <div class="bp-label">🎪 Pilih Big Event</div>
+        <div class="be-opts" id="beOpts">
+          <div class="beopt" onclick="selBigEvent('IIMS',this)">🚗 IIMS</div>
+          <div class="beopt" onclick="selBigEvent('GJAW',this)">🚘 GJAW</div>
+          <div class="beopt" onclick="selBigEvent('GIIAS',this)">🏎 GIIAS</div>
+        </div>
+        <div class="be-custom-row" id="beCustomRow">
+          <input type="text" id="beCustomInput" placeholder="Nama event lainnya...">
+          <button onclick="addBigEvent()">＋ Tambah</button>
+        </div>
+        <button onclick="toggleBeCustom()" style="background:none;border:none;color:#ff6b80;font-size:.75rem;cursor:pointer;padding:4px 0;font-family:inherit">＋ Event lainnya...</button>
+      </div>
+      <!-- Custom source panel -->
+      <div class="custom-src-panel" id="customSrcPanel">
+        <div class="cp-label">➕ Tambah Sumber Baru</div>
+        <div class="cs-row">
+          <input type="text" id="csInput" placeholder="Nama sumber baru...">
+          <button onclick="addCustomSrc()">＋ Simpan & Pilih</button>
+        </div>
+        <div class="saved-srcs" id="savedSrcs"></div>
+      </div>
+    </div>
+    <div class="f full"><label>Status Customer *</label>
+      <div class="stgrid">
+        <div class="stopt cold" onclick="selSt('cold',this)"><span>🧊</span>Cold</div>
+        <div class="stopt warm" onclick="selSt('warm',this)"><span>🌤</span>Warm</div>
+        <div class="stopt hot" onclick="selSt('hot',this)"><span>🔥</span>Hot</div>
+      </div>
+    </div>
+    <div class="f"><label>Tanggal Masuk</label><input type="date" id="fDt"></div>
+    <div class="f"><label>Nama Referral (jika ada)</label><input type="text" id="fRef" placeholder="Nama yang mereferensikan"></div>
+    <div class="f full"><label>Catatan</label><textarea id="fNt" placeholder="Catatan tambahan mengenai customer..."></textarea></div>
+  </div>
+  </div>
+
+  <!-- FOLLOW UP -->
+  <div class="tp" id="tFU">
+    <p style="font-size:.79rem;color:var(--muted);margin-bottom:12px">Catat setiap aktivitas follow up. Peringatan muncul jika tidak ada respons 4x dalam 1 minggu.</p>
+    <div class="ful" id="fuList"></div>
+    <button class="fuadd" onclick="addFu()">＋ Tambah Follow Up</button>
+    <div id="fuWarn" style="display:none" class="fuwarn"></div>
+  </div>
+
+  <!-- WHATSAPP -->
+  <div class="tp" id="tWA">
+    <div class="f" style="margin-bottom:11px"><label>Template Pesan</label>
+      <select id="waTpl" onchange="renderWA()">
+        <option value="perkenalan">👋 Perkenalan Pertama</option>
+        <option value="fu1">📞 Follow Up Ke-1</option>
+        <option value="fu2">📞 Follow Up Ke-2</option>
+        <option value="fu3">📞 Follow Up Ke-3 (Terakhir)</option>
+        <option value="testdrive">🚗 Undangan Test Drive</option>
+        <option value="promo">🎉 Info Promo / Event</option>
+        <option value="custom">✏️ Custom</option>
+      </select>
+    </div>
+    <div class="copanel"><div class="coprev" id="waPrev"></div></div>
+    <div id="waCustomBox" style="display:none;margin-top:10px">
+      <div class="f"><label>Pesan Custom</label>
+        <textarea id="waCustom" rows="5" style="font-size:.82rem;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--text);font-family:inherit;outline:none;width:100%;resize:vertical" oninput="renderWA()"></textarea>
+      </div>
+    </div>
+    <div class="coa">
+      <button class="bwa" onclick="openWA()">📱 Buka WhatsApp</button>
+      <button class="bcp" onclick="copyWA()">📋 Copy Pesan</button>
+      <button class="bcp" onclick="copyDataCust()">📋 Copy Data Customer</button>
+    </div>
+  </div>
+
+  <div class="ma"><button class="bcn" onclick="co('ovCust')">Batal</button><button class="bsv" onclick="saveCust()">💾 Simpan</button></div>
+</div>
+</div>
+
+<!-- ════ MODAL IMPORT ════ -->
+<div class="overlay" id="ovImp" onclick="obg(event,'ovImp')">
+<div class="modal wide">
+  <div class="mh"><div class="mttl">📥 Import Customer dari CSV</div><button class="mc" onclick="co('ovImp')">✕</button></div>
+  <p style="font-size:.8rem;color:var(--muted);margin-bottom:10px">Format: <strong style="color:var(--text)">Nama, No HP, Produk, Budget, Sumber, Status, Tanggal, Catatan</strong></p>
+  <p style="font-size:.76rem;color:var(--muted);margin-bottom:12px">Sumber: database / referensi / pameran / iims / gjaw / giias &nbsp;|&nbsp; Status: cold / warm / hot</p>
+  <div class="impz" id="impZone" onclick="document.getElementById('impFile').click()" ondragover="idov(event)" ondrop="idrop(event)">
+    <input type="file" id="impFile" accept=".csv" onchange="procImp(event)">
+    <div style="font-size:1.8rem;margin-bottom:7px">📄</div>
+    <p><strong>Klik atau drag file CSV</strong></p>
+    <p style="font-size:.73rem;margin-top:4px">Format: .csv (UTF-8)</p>
+  </div>
+  <div id="impPrev" style="display:none">
+    <p style="margin:12px 0 7px;font-size:.8rem;color:var(--muted)">Preview: <span id="impCnt">0</span> baris</p>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;overflow-x:auto" id="impTbl"></div>
+    <div class="ma">
+      <button class="bcn" onclick="co('ovImp')">Batal</button>
+      <button class="bsv" onclick="confirmImp()">✅ Import Sekarang</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ════ MODAL REPORT ════ -->
+<div class="overlay" id="ovRep" onclick="obg(event,'ovRep')">
+<div class="modal xl">
+  <div class="mh"><div class="mttl">📊 Laporan Wuling CRM</div><button class="mc" onclick="co('ovRep')">✕</button></div>
+  <!-- Filter -->
+  <div class="rep-filter">
+    <div>
+      <label>Jenis Laporan</label>
+      <div class="rep-tabs" style="margin-top:6px">
+        <button class="rtab active" onclick="setRepTab('monthly',this)">📅 Per Bulan</button>
+        <button class="rtab" onclick="setRepTab('fudate',this)">📞 Follow Up per Tanggal</button>
+      </div>
+    </div>
+    <div id="repMonthFilter">
+      <label>Bulan</label>
+      <select id="repMonth" onchange="buildReport()" style="margin-top:6px"></select>
+    </div>
+    <div id="repDateFilter" style="display:none">
+      <label>Tanggal Follow Up</label>
+      <input type="date" id="repDate" onchange="buildReport()" style="margin-top:6px">
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+      <button class="rep-xl-btn" onclick="exportRepExcel()">📊 Export Excel</button>
+      <button class="rep-pdf-btn" onclick="exportRepPDF()">📄 Export PDF</button>
+    </div>
+  </div>
+  <div id="repContent"></div>
+</div>
+</div>
+
+<!-- EDIT USER MODAL -->
+<div class="overlay" id="ovUser" onclick="obg(event,'ovUser')">
+<div class="modal">
+  <div class="mh"><div class="mttl">👤 Edit Profil Sales</div><button class="mc" onclick="co('ovUser')">✕</button></div>
+  <div class="f" style="margin-bottom:12px"><label>Nama Sales</label><input type="text" id="uEditName" placeholder="Nama Anda"></div>
+  <div class="f" style="margin-bottom:12px"><label>Nama Dealer</label><input type="text" id="uEditDealer" placeholder="Nama Showroom"></div>
+  <div class="ma"><button class="bcn" onclick="co('ovUser')">Batal</button><button class="bsv" onclick="saveUser()">💾 Simpan</button></div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="text/plain" id="mainjs">
+
+// ══════════════════════════════════════════════
+// USER / SETUP
+// ══════════════════════════════════════════════
+let USER = JSON.parse(localStorage.getItem('wuling_user')||'null');
+
+function doSetup(){
+  const nm=document.getElementById('setupName').value.trim();
+  const dl=document.getElementById('setupDealer').value.trim();
+  if(!nm){toast('⚠️ Nama sales wajib diisi!','danger');return}
+  USER={name:nm,dealer:dl||'Wuling Motors'};
+  localStorage.setItem('wuling_user',JSON.stringify(USER));
+  applyUser();
+  document.getElementById('setupScreen').style.display='none';
+}
+function applyUser(){
+  if(!USER) return;
+  document.getElementById('uName').textContent=USER.name;
+  document.getElementById('uAvatar').textContent=USER.name.charAt(0).toUpperCase();
+  const av2=document.getElementById('uAvatar2');
+  if(av2) av2.textContent=USER.name.charAt(0).toUpperCase();
+  document.getElementById('dealerName').textContent=USER.dealer||'Wuling CRM';
+}
+function toggleMenu(){
+  const d=document.getElementById('haDropdown');
+  d.classList.toggle('open');
+  // Close when clicking outside
+  if(d.classList.contains('open')){
+    setTimeout(()=>document.addEventListener('click',closeMenuOutside),10);
+  }
+}
+function closeMenu(){document.getElementById('haDropdown').classList.remove('open');document.removeEventListener('click',closeMenuOutside)}
+function closeMenuOutside(e){if(!document.getElementById('haDropdown').contains(e.target)&&e.target.id!=='menuBtn')closeMenu()}
+function editUser(){
+  document.getElementById('uEditName').value=USER?.name||'';
+  document.getElementById('uEditDealer').value=USER?.dealer||'';
+  document.getElementById('ovUser').classList.add('show');
+}
+function saveUser(){
+  const nm=document.getElementById('uEditName').value.trim();
+  const dl=document.getElementById('uEditDealer').value.trim();
+  if(!nm){toast('⚠️ Nama wajib diisi!','danger');return}
+  USER={name:nm,dealer:dl||'Wuling Motors'};
+  localStorage.setItem('wuling_user',JSON.stringify(USER));
+  applyUser();co('ovUser');toast('✅ Profil diperbarui!','success');
+}
+
+// ══════════════════════════════════════════════
+// BRAND & PRODUCT DATA
+// ══════════════════════════════════════════════
+const BRAND_META={
+  'Wuling':  {cls:'blog-wuling', abbr:'WL',  color:'#c8102e'},
+  'MG':      {cls:'blog-mg',     abbr:'MG',  color:'#cc0000'},
+  'Geely':   {cls:'blog-geely',  abbr:'GL',  color:'#003087'},
+  'Hyundai': {cls:'blog-hyundai',abbr:'HY',  color:'#002c5f'},
+  'Mazda':   {cls:'blog-mazda',  abbr:'MZ',  color:'#1a1a1a'},
+  'Jetour':  {cls:'blog-jetour', abbr:'JT',  color:'#00923f'},
+  'GWM':     {cls:'blog-gwm',    abbr:'GWM', color:'#e30613'},
+};
+const DEFAULT_PRODUCTS={
+  'Wuling':  ['Air ev','BinguoEV','Almaz','Almaz RS','Cortez','Formo S','Confero S','Cloud EV'],
+  'MG':      ['MG 4 EV','MG ZS','MG ZS EV','MG 5','MG HS','MG RX5'],
+  'Geely':   ['Coolray','Emgrand','Okavango','Preface'],
+  'Hyundai': ['Creta','Stargazer','Palisade','Ioniq 5','Ioniq 6','Tucson','Santa Fe'],
+  'Mazda':   ['CX-3','CX-5','CX-60','Mazda 2','Mazda 3','CX-30'],
+  'Jetour':  ['X70','X90 Plus','Dashing','T2'],
+  'GWM':     ['Tank 300','Tank 500','Ora 03','Haval Jolion','Haval H6'],
+};
+function getCustomProds(brand){return JSON.parse(localStorage.getItem('cp_'+brand)||'[]')}
+function saveCustomProds(brand,arr){localStorage.setItem('cp_'+brand,JSON.stringify(arr))}
+function getAllProds(brand){
+  if(!brand||brand==='__custom__') return[];
+  return[...(DEFAULT_PRODUCTS[brand]||[]),...getCustomProds(brand)];
+}
+let sBrand='',sProduct='',sCustomBrand='';
+function selBrand(brand,el){
+  sBrand=brand;sProduct='';sCustomBrand='';
+  document.querySelectorAll('.bopt').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+  const crow=document.getElementById('customBrandRow');
+  const psec=document.getElementById('productSection');
+  if(brand==='__custom__'){crow.style.display='block';psec.style.display='none';}
+  else{crow.style.display='none';renderProdList(brand);psec.style.display='block';
+    document.getElementById('prodPanelLbl').textContent=brand+' — Pilih / Tambah Produk';}
+  renderWA();
+}
+function applyCustomBrand(){
+  const v=document.getElementById('customBrandInput').value.trim();
+  if(!v){toast('⚠️ Nama brand wajib diisi!','danger');return}
+  sBrand=v;sCustomBrand=v;
+  document.getElementById('customBrandRow').style.display='none';
+  renderProdList(v);
+  document.getElementById('productSection').style.display='block';
+  document.getElementById('prodPanelLbl').textContent=v+' — Pilih / Tambah Produk';
+  toast('✅ Brand "'+v+'" dipilih!','success');
+}
+function renderProdList(brand){
+  sProduct='';
+  const prods=getAllProds(brand);
+  const el=document.getElementById('prodList');
+  if(!prods.length){el.innerHTML='<span class="no-prod">Belum ada produk. Tambah di bawah.</span>';return}
+  el.innerHTML=prods.map(p=>{
+    const isCustom=!(DEFAULT_PRODUCTS[brand]||[]).includes(p);
+    return`<button class="prodopt" onclick="selProd('${p.replace(/'/g,"\\'")}',this)">${esc(p)}${isCustom?`<span class="xp" onclick="delProd(event,'${brand.replace(/'/g,"\\'")}','${p.replace(/'/g,"\\'")}')">✕</span>`:''}</button>`;
+  }).join('');
+}
+function selProd(p,el){
+  sProduct=p;
+  document.querySelectorAll('#prodList .prodopt').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');renderWA();
+}
+function addProductToList(){
+  const v=document.getElementById('prodAddInput').value.trim();
+  if(!v){toast('⚠️ Nama produk wajib diisi!','danger');return}
+  const brand=sBrand==='__custom__'?sCustomBrand:sBrand;
+  const custom=getCustomProds(brand);
+  if(!custom.includes(v)&&!(DEFAULT_PRODUCTS[brand]||[]).includes(v)){custom.push(v);saveCustomProds(brand,custom);}
+  document.getElementById('prodAddInput').value='';
+  renderProdList(brand);sProduct=v;
+  setTimeout(()=>{document.querySelectorAll('#prodList .prodopt').forEach(b=>{if(b.textContent.trim().startsWith(v))b.classList.add('sel')})},50);
+  toast('✅ Produk "'+v+'" ditambahkan!','success');
+}
+function delProd(e,brand,p){
+  e.stopPropagation();
+  if(!confirm('Hapus produk "'+p+'"?'))return;
+  const custom=getCustomProds(brand).filter(x=>x!==p);
+  saveCustomProds(brand,custom);
+  if(sProduct===p) sProduct='';
+  renderProdList(brand);toast('🗑 Produk dihapus.','warn');
+}
+function selBrandById(brand,prod){
+  if(!brand)return;
+  sBrand=brand;sProduct=prod||'';
+  const el=document.querySelector(`.bopt[data-brand="${brand}"]`);
+  if(el){el.classList.add('sel');
+    document.getElementById('customBrandRow').style.display='none';
+    renderProdList(brand);
+    document.getElementById('productSection').style.display='block';
+    document.getElementById('prodPanelLbl').textContent=brand+' — Pilih / Tambah Produk';
+  } else {
+    // custom brand
+    const custEl=document.querySelector('.bopt[data-brand="__custom__"]');
+    if(custEl)custEl.classList.add('sel');
+    sCustomBrand=brand;renderProdList(brand);
+    document.getElementById('productSection').style.display='block';
+    document.getElementById('prodPanelLbl').textContent=brand+' — Pilih / Tambah Produk';
+  }
+  if(prod) setTimeout(()=>{document.querySelectorAll('#prodList .prodopt').forEach(b=>{if(b.childNodes[0]&&b.childNodes[0].textContent&&b.childNodes[0].textContent.trim()===prod||b.textContent.trim().startsWith(prod))b.classList.add('sel')})},60);
+}
+function getFullProduct(c){return c.brand&&c.product?c.brand+' '+c.product:c.brand||c.product||'—'}
+function brandPill(c){
+  const b=c.brand;if(!b)return`<span style="color:var(--muted);font-size:.78rem">—</span>`;
+  const m=BRAND_META[b];
+  const cls=m?m.cls:'blog-custom';
+  const abbr=m?m.abbr:b.slice(0,3).toUpperCase();
+  return`<div class="brand-pill"><span class="bico ${cls}">${abbr}</span><span style="font-size:.78rem;font-weight:600">${esc(b)}</span></div>`;
+}
+
+// ══════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════
+let C = JSON.parse(localStorage.getItem('wuling_crm')||'[]');
+let eid=null, ssrc='', sstatus='cold', spang='Bapak', fsrc='all', sq='', pg=1, fuRows=[], impRows=[];
+const PER=15;
+let curRepTab='monthly';
+
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
+function sv(){localStorage.setItem('wuling_crm',JSON.stringify(C))}
+function td(n=0){const d=new Date();d.setDate(d.getDate()-n);return d.toISOString().split('T')[0]}
+function today(){return td(0)}
+
+// Seed sample data
+if(!C.length){
+  C=[
+    {id:uid(),name:'Rudi Santoso',phone:'081234567890',panggilan:'Bapak',brand:'Wuling',product:'Air ev',budget:'Rp 200 jt — Rp 300 jt',src:'pameran',status:'hot',date:td(2),ref:'',note:'Sangat tertarik, minta jadwal TD',followups:[{id:uid(),date:td(2),result:'responded',note:'Minta brosur & price list'},{id:uid(),date:td(1),result:'interested',note:'Tertarik warna putih'}],statusDate:td(2)},
+    {id:uid(),name:'Siti Rahayu',phone:'087765432100',panggilan:'Ibu',brand:'MG',product:'MG ZS EV',budget:'Rp 400 jt — Rp 500 jt',src:'database',status:'warm',date:td(5),ref:'',note:'',followups:[{id:uid(),date:td(5),result:'responded',note:''},{id:uid(),date:td(4),result:'noresponse',note:''}],statusDate:td(5)},
+    {id:uid(),name:'Andi Wijaya',phone:'082211223344',panggilan:'Mas',brand:'Hyundai',product:'Ioniq 5',budget:'Rp 700 jt — Rp 800 jt',src:'referensi',status:'cold',date:td(1),ref:'Pak Budi',note:'',followups:[],statusDate:td(1)},
+    {id:uid(),name:'Mega Lestari',phone:'089988776655',panggilan:'Kak',brand:'Wuling',product:'Cortez',budget:'Rp 300 jt — Rp 400 jt',src:'bigevent:GIIAS',status:'deal',date:td(12),ref:'',note:'DEAL unit putih',followups:[{id:uid(),date:td(12),result:'responded',note:''},{id:uid(),date:td(11),result:'interested',note:''},{id:uid(),date:td(10),result:'callback',note:''},{id:uid(),date:td(9),result:'deal',note:'DEAL!'}],statusDate:td(9)},
+    {id:uid(),name:'Deni Kurniawan',phone:'081355667788',panggilan:'Bapak',brand:'Mazda',product:'CX-5',budget:'Rp 500 jt — Rp 600 jt',src:'bigevent:IIMS',status:'lost',date:td(20),ref:'',note:'Pilih kompetitor',followups:[{id:uid(),date:td(20),result:'responded',note:''},{id:uid(),date:td(18),result:'noresponse',note:''},{id:uid(),date:td(16),result:'noresponse',note:''},{id:uid(),date:td(15),result:'notinterested',note:'Pilih Honda HRV'}],statusDate:td(15)},
+  ];
+  sv();
+}
+
+// ══════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function fdate(d){if(!d)return'—';const[y,m,dy]=d.split('-');const M=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];return`${dy} ${M[+m-1]} ${y}`}
+function waNum(p){return p.replace(/\D/g,'').replace(/^0/,'62')}
+function isWL(c){
+  if(c.status==='deal'||c.status==='lost') return false;
+  if(!c.followups||c.followups.length<4) return false;
+  const cut=new Date();cut.setDate(cut.getDate()-7);
+  const rec=c.followups.filter(f=>new Date(f.date)>=cut);
+  return rec.filter(f=>f.result==='noresponse').length>=4;
+}
+function stLbl(s){return{cold:'🧊 Cold',warm:'🌤 Warm',hot:'🔥 Hot',deal:'✅ Deal',lost:'❌ Lost'}[s]||s||'—'}
+function srcLbl(t){
+  const base={database:'🗄 Database',referensi:'🤝 Referensi',pameran:'🏛 Pameran',iklan:'📢 Iklan',web:'🌐 Website',sosmed:'📱 Sosmed'};
+  if(base[t]) return base[t];
+  if(t&&t.startsWith('bigevent:')) return'🎪 '+t.split(':')[1];
+  if(t&&t.startsWith('custom:')) return'📌 '+t.split(':')[1];
+  if(t==='bigevent') return'🎪 Big Event';
+  return t||'—';
+}
+function srcBadgeClass(t){
+  if(!t) return'database';
+  if(t.startsWith('bigevent')) return'bigevent';
+  if(t.startsWith('custom:')) return'custom-src';
+  return t;
+}
+function srcBadge(t){return`<span class="badge ${srcBadgeClass(t)}">${srcLbl(t)}</span>`}
+function prospects(){return C.filter(c=>c.status!=='deal'&&c.status!=='lost')}
+function deals(){return C.filter(c=>c.status==='deal')}
+function losts(){return C.filter(c=>c.status==='lost')}
+
+// ══════════════════════════════════════════════
+// MAIN TAB SWITCH
+// ══════════════════════════════════════════════
+let curMainTab='prospects';
+function setMainTab(tab,el){
+  curMainTab=tab;
+  document.querySelectorAll('.main-tabs .mtab').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');
+  ['prospects','deal','lost'].forEach(t=>{
+    const el2=document.getElementById('tab-'+t);
+    if(el2) el2.style.display=t===tab?'block':'none';
+  });
+  render();
+}
+
+// ══════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════
+function filt(){
+  return prospects().filter(c=>{
+    const mst=fsrc==='all'||c.status===fsrc;
+    const q=sq.toLowerCase();
+    const mq=!q||c.name.toLowerCase().includes(q)||(c.phone||'').includes(q)||(c.product||'').toLowerCase().includes(q)||(c.brand||'').toLowerCase().includes(q);
+    return mst&&mq;
+  });
+}
+
+function render(){
+  const pr=prospects(), dl=deals(), ls=losts(), tot=C.length;
+  document.getElementById('cnt-all').textContent=pr.length;
+  document.getElementById('cnt-cold').textContent=pr.filter(c=>c.status==='cold').length;
+  document.getElementById('cnt-warm').textContent=pr.filter(c=>c.status==='warm').length;
+  document.getElementById('cnt-hot').textContent=pr.filter(c=>c.status==='hot').length;
+  document.getElementById('cnt-deal').textContent=dl.length;
+  document.getElementById('cnt-lost').textContent=ls.length;
+
+  const wl=prospects().filter(isWL);
+  const wb=document.getElementById('wbanner');
+  if(wl.length){wb.style.display='flex';document.getElementById('wcnt').textContent=wl.length}else wb.style.display='none';
+
+  if(curMainTab==='prospects') renderProspects();
+  if(curMainTab==='deal') renderDealLost('deal');
+  if(curMainTab==='lost') renderDealLost('lost');
+}
+
+function renderProspects(){
+  const data=filt(), tot=data.length;
+  const pages=Math.max(1,Math.ceil(tot/PER));
+  if(pg>pages) pg=pages;
+  const sl=data.slice((pg-1)*PER,pg*PER);
+  const tb=document.getElementById('tbody'), em=document.getElementById('empt');
+  if(!sl.length){tb.innerHTML='';em.style.display=''}
+  else{
+    em.style.display='none';
+    tb.innerHTML=sl.map((c,i)=>{
+      const dots=[0,1,2,3].map(n=>{const f=c.followups&&c.followups[n];const cls=!f?'mt':f.result==='noresponse'?'nr':'done';return`<div class="fudot ${cls}" title="${f?'FU ke-'+(n+1)+': '+f.result:'Belum'}"></div>`}).join('');
+      const wf=isWL(c);
+      const stBadge=wf?'<span class="badge wf">⚠️ No Resp</span>':`<span class="badge ${c.status}">${stLbl(c.status)}</span>`;
+      return`<tr>
+        <td style="color:var(--muted);font-size:.72rem">${(pg-1)*PER+i+1}</td>
+        <td><div class="tn">${c.panggilan?`<span style="font-size:.7rem;color:var(--muted);font-weight:400">${esc(c.panggilan)}</span> `:''} ${esc(c.name)}</div><div class="ts">${esc(c.phone)}</div></td>
+        <td><div style="font-size:.8rem;font-weight:500">${esc(c.product||'—')}</div><div style="margin-top:3px">${brandPill(c)}</div><div class="ts">${esc(c.budget||'—')}</div></td>
+        <td>${srcBadge(c.src)}</td>
+        <td>${stBadge}</td>
+        <td><div style="display:flex;align-items:center;gap:5px"><div class="fudots">${dots}</div><span style="font-size:.7rem;color:var(--muted)">${(c.followups||[]).length}x</span></div></td>
+        <td style="font-size:.75rem;color:var(--muted)">${fdate(c.date)}</td>
+        <td><div class="acts">
+          <button class="bs wa" title="Chat WA" onclick="qWA('${c.id}')">💬</button>
+          <button class="bs cp" title="Copy Data" onclick="qCopy('${c.id}')">📋</button>
+          <button class="bs fu" title="Follow Up" onclick="openFU('${c.id}')">📞</button>
+          <button class="bs ed" title="Edit" onclick="openModal('${c.id}')">✏️</button>
+          <button class="bs-deal" onclick="moveTo('${c.id}','deal')">✅ Deal</button>
+          <button class="bs-lost" onclick="moveTo('${c.id}','lost')">❌ Lost</button>
+          <button class="bs dl" title="Hapus" onclick="del('${c.id}')">🗑</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+  document.getElementById('pginfo').textContent=`Menampilkan ${sl.length} dari ${tot} data`;
+  const pb=document.getElementById('pbtns');pb.innerHTML='';
+  for(let p2=1;p2<=pages;p2++){const b=document.createElement('button');b.className='pb'+(p2===pg?' active':'');b.textContent=p2;b.onclick=()=>{pg=p2;render()};pb.appendChild(b)}
+}
+
+function renderDealLost(type){
+  const data=type==='deal'?deals():losts();
+  const tb=document.getElementById('tbody-'+type), em=document.getElementById('empt-'+type);
+  if(!data.length){tb.innerHTML='';em.style.display='';return}
+  em.style.display='none';
+  tb.innerHTML=data.map((c,i)=>`<tr>
+    <td style="color:var(--muted);font-size:.72rem">${i+1}</td>
+    <td><div class="tn">${c.panggilan?`<span style="font-size:.7rem;color:var(--muted);font-weight:400">${esc(c.panggilan)}</span> `:''} ${esc(c.name)}</div><div class="ts">${esc(c.phone)}</div></td>
+    <td><div style="font-size:.8rem;font-weight:500">${esc(c.product||'—')}</div><div style="margin-top:3px">${brandPill(c)}</div><div class="ts">${esc(c.budget||'—')}</div></td>
+    <td>${srcBadge(c.src)}</td>
+    <td style="font-size:.75rem;color:var(--muted)">${fdate(c.statusDate||c.date)}</td>
+    <td><div class="acts">
+      <button class="bs wa" title="Chat WA" onclick="qWA('${c.id}')">💬</button>
+      <button class="bs cp" title="Copy" onclick="qCopy('${c.id}')">📋</button>
+      ${type==='lost'?`<button class="bs-deal" style="font-size:.62rem" onclick="moveTo('${c.id}','cold')">↩ Reaktivasi</button>`:''}
+      <button class="bs dl" title="Hapus" onclick="del('${c.id}')">🗑</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+// Move to Deal / Lost
+function moveTo(id, status){
+  const c=C.find(x=>x.id===id);
+  if(!c) return;
+  const labels={deal:'Deal',lost:'Lost',cold:'Reaktivasi (Cold)'};
+  if(!confirm(`Ubah ${c.name} ke status ${labels[status]||status}?`)) return;
+  c.status=status;
+  c.statusDate=today();
+  sv();render();
+  toast(`✅ ${c.name} dipindahkan ke ${labels[status]||status}!`,'success');
+  // Auto-switch tab
+  if(status==='deal') setMainTab('deal',document.querySelectorAll('.main-tabs .mtab')[1]);
+  if(status==='lost') setMainTab('lost',document.querySelectorAll('.main-tabs .mtab')[2]);
+}
+
+// ══════════════════════════════════════════════
+// FILTER TABS
+// ══════════════════════════════════════════════
+document.getElementById('srcTabs').querySelectorAll('.ft').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.getElementById('srcTabs').querySelectorAll('.ft').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');fsrc=btn.dataset.val;pg=1;render();
+  });
+});
+document.getElementById('srch').addEventListener('input',e=>{sq=e.target.value;pg=1;render()});
+
+// ══════════════════════════════════════════════
+// MODAL CUSTOMER
+// ══════════════════════════════════════════════
+function openModal(id){
+  eid=id||null;ssrc='';sstatus='cold';spang='Bapak';fuRows=[];
+  document.getElementById('mtitle').textContent=id?'Edit Customer':'Tambah Customer Baru';
+  document.querySelectorAll('.sopt').forEach(e=>e.classList.remove('sel'));
+  sBrand='';sProduct='';sCustomBrand='';
+  document.querySelectorAll('.bopt').forEach(e=>e.classList.remove('sel'));
+  document.getElementById('productSection').style.display='none';
+  document.getElementById('customBrandRow').style.display='none';
+  if(document.getElementById('customBrandInput')) document.getElementById('customBrandInput').value='';
+  // Default panggilan = Bapak
+  const defPang=document.querySelector('.pangopt');
+  if(defPang) defPang.classList.add('sel');
+  document.getElementById('bigeventPanel').classList.remove('show');
+  document.getElementById('customSrcPanel').classList.remove('show');
+  document.getElementById('beCustomRow').classList.remove('show');
+  beCustomOpen=false;
+  ['fNm','fPh','fRef','fNt'].forEach(f=>document.getElementById(f).value='');
+  // fPr removed - using brand/product selectors
+  document.getElementById('fBg').value='';
+  document.getElementById('fDt').value=today();
+  stab('tInfo',document.querySelector('.itab'));
+  if(id){
+    const c=C.find(x=>x.id===id);
+    if(c){
+      document.getElementById('fNm').value=c.name;
+      document.getElementById('fPh').value=c.phone;
+      // brand loaded via selBrandById
+      document.getElementById('fBg').value=c.budget||'';
+      document.getElementById('fDt').value=c.date||today();
+      document.getElementById('fRef').value=c.ref||'';
+      document.getElementById('fNt').value=c.note||'';
+      selSrcId(c.src);selStId(c.status||'cold');
+      spang=c.panggilan||'Bapak';
+      selPangId(spang);
+      fuRows=JSON.parse(JSON.stringify(c.followups||[]));
+    }
+  }
+  renderFuList();renderWA();
+  document.getElementById('ovCust').classList.add('show');
+}
+function openFU(id){openModal(id);setTimeout(()=>stab('tFU',document.querySelectorAll('.itab')[1]),60)}
+function co(id){document.getElementById(id).classList.remove('show')}
+function obg(e,id){if(e.target===document.getElementById(id))co(id)}
+function stab(tp,el){
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.itab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(tp).classList.add('active');
+  if(el)el.classList.add('active');
+}
+function selSrc(t,el){
+  ssrc=t;
+  document.querySelectorAll('.sopt').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+  // Show/hide sub-panels
+  const bep=document.getElementById('bigeventPanel');
+  const csp=document.getElementById('customSrcPanel');
+  bep.classList.toggle('show', t==='bigevent');
+  csp.classList.toggle('show', t==='custom-src');
+  // If switching away from bigevent, clear sub-selection
+  if(t!=='bigevent'){document.querySelectorAll('.beopt').forEach(e=>e.classList.remove('sel'));document.getElementById('beCustomRow').classList.remove('show')}
+  if(t!=='custom-src') document.getElementById('csInput').value='';
+  // If custom-src but no name yet, don't set ssrc yet
+  if(t==='custom-src') ssrc='';
+  renderSavedSrcs();
+}
+function selSrcId(t){
+  ssrc=t;
+  // For bigevent:XXX or custom:XXX, highlight the parent button
+  const base=t&&t.startsWith('bigevent')?'bigevent':t&&t.startsWith('custom:')?'custom-src':t;
+  document.querySelectorAll('.sopt').forEach(e=>e.classList.remove('sel'));
+  const el=document.querySelector('.sopt.'+base);
+  if(el) el.classList.add('sel');
+  const bep=document.getElementById('bigeventPanel');
+  const csp=document.getElementById('customSrcPanel');
+  if(t&&t.startsWith('bigevent:')){
+    bep.classList.add('show');
+    const ename=t.split(':')[1];
+    document.querySelectorAll('.beopt').forEach(e=>e.classList.toggle('sel',e.textContent.trim().replace(/[^\w\s]/g,'').trim()===ename||e.textContent.includes(ename)));
+  } else {bep.classList.remove('show')}
+  if(t&&t.startsWith('custom:')){csp.classList.add('show');renderSavedSrcs()}else csp.classList.remove('show');
+}
+
+// Big Event sub-selection
+let beCustomOpen=false;
+function selBigEvent(name,el){
+  document.querySelectorAll('.beopt').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+  ssrc='bigevent:'+name;
+}
+function toggleBeCustom(){
+  beCustomOpen=!beCustomOpen;
+  document.getElementById('beCustomRow').classList.toggle('show',beCustomOpen);
+}
+function addBigEvent(){
+  const val=document.getElementById('beCustomInput').value.trim();
+  if(!val){toast('⚠️ Nama event wajib diisi!','danger');return}
+  // Add button if not exists
+  const opts=document.getElementById('beOpts');
+  if(![...opts.querySelectorAll('.beopt')].some(b=>b.dataset.ename===val)){
+    const btn=document.createElement('div');
+    btn.className='beopt';btn.dataset.ename=val;
+    btn.textContent='🏁 '+val;
+    btn.onclick=function(){selBigEvent(val,this)};
+    opts.appendChild(btn);
+  }
+  // Select it
+  document.querySelectorAll('.beopt').forEach(e=>e.classList.remove('sel'));
+  opts.querySelector(`[data-ename="${val}"]`).classList.add('sel');
+  ssrc='bigevent:'+val;
+  document.getElementById('beCustomInput').value='';
+  document.getElementById('beCustomRow').classList.remove('show');
+  beCustomOpen=false;
+  toast('✅ Event "'+val+'" ditambahkan!','success');
+}
+
+// Custom source
+let customSources=JSON.parse(localStorage.getItem('wuling_custom_srcs')||'[]');
+function renderSavedSrcs(){
+  const el=document.getElementById('savedSrcs');
+  if(!customSources.length){el.innerHTML='<span style="font-size:.74rem;color:var(--muted)">Belum ada sumber tersimpan.</span>';return}
+  el.innerHTML=customSources.map(s=>`<div class="beopt ${ssrc==='custom:'+s?'sel':''}" onclick="pickCustomSrc('${s.replace(/'/g,"\\'")}',this)" style="border-color:#9ca3af;color:#9ca3af">📌 ${esc(s)}</div>`).join('');
+}
+function pickCustomSrc(name,el){
+  document.querySelectorAll('#savedSrcs .beopt').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+  ssrc='custom:'+name;
+}
+function addCustomSrc(){
+  const val=document.getElementById('csInput').value.trim();
+  if(!val){toast('⚠️ Nama sumber wajib diisi!','danger');return}
+  if(!customSources.includes(val)) customSources.push(val);
+  localStorage.setItem('wuling_custom_srcs',JSON.stringify(customSources));
+  ssrc='custom:'+val;
+  document.getElementById('csInput').value='';
+  renderSavedSrcs();
+  toast('✅ Sumber "'+val+'" disimpan!','success');
+}
+function selSt(s,el){sstatus=s;document.querySelectorAll('.stopt').forEach(e=>e.classList.remove('sel'));el.classList.add('sel')}
+function selStId(s){sstatus=s;const e=document.querySelector('.stopt.'+s);if(e)e.classList.add('sel')}
+function selPang(p,el){spang=p;document.querySelectorAll('.pangopt').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');renderWA()}
+function selPangId(p){spang=p;document.querySelectorAll('.pangopt').forEach(e=>{e.classList.toggle('sel',e.textContent.trim().includes(p))});}
+
+function saveCust(){
+  const nm=document.getElementById('fNm').value.trim();
+  const ph=document.getElementById('fPh').value.trim();
+  if(!nm){toast('⚠️ Nama wajib diisi!','danger');return}
+  if(!ph){toast('⚠️ No. HP wajib diisi!','danger');return}
+  if(!ssrc){toast('⚠️ Pilih sumber leads!','danger');return}
+  if(!sstatus){toast('⚠️ Pilih status customer!','danger');return}
+  const fuCollected=collectFu();
+  const realBrand=sBrand==='__custom__'?sCustomBrand:sBrand;
+  const obj={
+    id:eid||uid(),name:nm,phone:ph,
+    panggilan:spang||'Bapak',
+    brand:realBrand||'',
+    product:sProduct||'',
+    budget:document.getElementById('fBg').value,
+    src:ssrc,status:sstatus,
+    date:document.getElementById('fDt').value,
+    ref:document.getElementById('fRef').value.trim(),
+    note:document.getElementById('fNt').value.trim(),
+    followups:fuCollected,
+    statusDate:today(),
+  };
+  const tmpObj={...obj,followups:fuCollected};
+  if(isWL(tmpObj)&&obj.status!=='lost'&&confirm('⚠️ Customer ini tidak merespons 4x dalam 1 minggu.\nUbah status ke Lost?')) obj.status='lost';
+  if(eid){const i=C.findIndex(c=>c.id===eid);C[i]=obj;toast('✅ Data diperbarui!','success')}
+  else{C.unshift(obj);toast('✅ Customer ditambahkan!','success')}
+  sv();co('ovCust');render();
+}
+function del(id){
+  const c=C.find(x=>x.id===id);
+  if(!c||!confirm(`Hapus data ${c.name}?`)) return;
+  C=C.filter(x=>x.id!==id);sv();render();toast('🗑 Data dihapus.','danger');
+}
+
+// ══════════════════════════════════════════════
+// FOLLOW UP
+// ══════════════════════════════════════════════
+const FURES=[{v:'responded',l:'✅ Merespons'},{v:'interested',l:'🔥 Tertarik'},{v:'noresponse',l:'📵 Tidak Merespons'},{v:'callback',l:'📅 Minta Callback'},{v:'notinterested',l:'👎 Tidak Berminat'},{v:'deal',l:'🤝 DEAL!'}];
+function addFu(){fuRows.push({id:uid(),date:today(),result:'',note:''});renderFuList()}
+function renderFuList(){
+  const el=document.getElementById('fuList');
+  if(!fuRows.length){el.innerHTML='<p style="font-size:.78rem;color:var(--muted);text-align:center;padding:16px">Belum ada follow up. Klik tombol di bawah.</p>';checkFuWarn();return}
+  el.innerHTML=fuRows.map((f,i)=>`<div class="fui" id="fui${f.id}">
+    <div class="fuih">
+      <span class="fun">Follow Up ke-${i+1}</span>
+      <div style="display:flex;gap:7px;align-items:center">
+        <input type="date" value="${f.date||today()}" onchange="fuRows[${i}].date=this.value"
+          style="background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:3px 7px;color:var(--text);font-size:.74rem;outline:none;font-family:inherit">
+        <button onclick="rmFu(${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.88rem;padding:0">✕</button>
+      </div>
+    </div>
+    <div class="furr">${FURES.map(r=>`<div class="furo ${r.v} ${f.result===r.v?'sel':''}" onclick="setFuR(${i},'${r.v}',this)">${r.l}</div>`).join('')}</div>
+    <textarea class="funi" placeholder="Catatan hasil follow up..." onchange="fuRows[${i}].note=this.value">${f.note||''}</textarea>
+  </div>`).join('');
+  checkFuWarn();
+}
+function checkFuWarn(){
+  const nr=fuRows.filter(f=>f.result==='noresponse').length;
+  const w=document.getElementById('fuWarn');
+  if(nr>=4){w.style.display='block';w.innerHTML=`⚠️ Tidak merespons <strong>${nr}x</strong>. Pertimbangkan ubah status ke <strong>Lost</strong>.`}
+  else w.style.display='none';
+}
+function setFuR(i,v,el){fuRows[i].result=v;el.closest('.fui').querySelectorAll('.furo').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');checkFuWarn()}
+function rmFu(i){fuRows.splice(i,1);renderFuList()}
+function collectFu(){document.querySelectorAll('#fuList .funi').forEach((ta,i)=>{if(fuRows[i])fuRows[i].note=ta.value});return JSON.parse(JSON.stringify(fuRows))}
+
+// ══════════════════════════════════════════════
+// WHATSAPP TEMPLATES — Wuling
+// ══════════════════════════════════════════════
+const WTPL={
+  perkenalan:c=>{
+    const sales=USER?.name||'Sales';
+    const dealer=USER?.dealer||'Dealer kami';
+    const sp=sapaan(c);
+    const prod=c.brand&&c.product?`*${c.brand} ${c.product}*`:c.brand?`*${c.brand}*`:c.product?`*${c.product}*`:'*kendaraan pilihan Anda*';
+    return`Halo ${sp} 👋\n\nPerkenalkan, saya *${sales}* dari *${dealer}*.\n\nSebelumnya terima kasih sudah mengunjungi booth kami. Saya ingin memberikan informasi lebih lanjut mengenai ${prod} yang ${sp} minati. 🚗\n\nApakah ${sp} ada waktu untuk berdiskusi singkat? Saya siap membantu menemukan pilihan terbaik sesuai kebutuhan ${sp}. 😊`;
+  },
+  fu1:c=>{const sp=sapaan(c);const prod=c.brand&&c.product?`${c.brand} ${c.product}`:c.brand||c.product||'kendaraan';return`Halo ${sp} 🙏\n\nSaya ingin menindaklanjuti mengenai *${prod}* yang sebelumnya ${sp} minati.\n\nApakah ${sp} sudah sempat melihat informasi yang kami sampaikan? Jika ada pertanyaan seputar spesifikasi, harga, atau promo cicilan, saya siap membantu. 😊`},
+  fu2:c=>{const sp=sapaan(c);const prod=c.brand&&c.product?`${c.brand} ${c.product}`:c.brand||c.product||'kendaraan';return`Halo ${sp} 👋\n\nSemoga ${sp} dalam keadaan baik. Saya kembali menghubungi terkait *${prod}*.\n\nSaat ini ada *promo spesial* yang sayang untuk dilewatkan:\n✅ DP ringan mulai dari 10%\n✅ Cicilan terjangkau\n✅ Free aksesoris pilihan\n\nApakah ${sp} ingin tahu lebih lanjut? 🚗`},
+  fu3:c=>{const sp=sapaan(c);const prod=c.brand&&c.product?`${c.brand} ${c.product}`:c.brand||c.product||'kendaraan';return`Halo ${sp} 🙏\n\nIni adalah pesan terakhir dari saya terkait *${prod}*.\n\nJika saat ini belum menjadi prioritas, tidak masalah. Namun jika sewaktu-waktu ${sp} membutuhkan informasi kendaraan, saya selalu siap membantu.\n\nTerima kasih atas perhatiannya, ${sp}! 🌟`},
+  testdrive:c=>{const sp=sapaan(c);const prod=c.brand&&c.product?`${c.brand} ${c.product}`:c.brand||'kendaraan kami';return`Halo ${sp} 🚗\n\nKami mengundang ${sp} untuk *Test Drive ${prod}* secara langsung di showroom kami!\n\nRasakan sendiri kenyamanan & performanya. Tidak ada kewajiban pembelian. 😊\n\nApakah ${sp} berkenan menjadwalkan Test Drive dalam waktu dekat?`},
+  promo:c=>{const sp=sapaan(c);const prod=c.brand&&c.product?`${c.brand} ${c.product}`:c.brand||c.product||'kendaraan pilihan';return`Halo ${sp} 🎉\n\nAda *promo spesial* yang tidak boleh ${sp} lewatkan!\n\n🚗 *${prod}*\n💰 Budget: ${c.budget||'Hubungi kami untuk info harga'}\n🎁 Bonus aksesoris & layanan purna jual eksklusif\n\nPromo berlaku terbatas! Apakah ${sp} ingin info selengkapnya? 📞`},
+  custom:()=>document.getElementById('waCustom')?.value||'',
+};
+function getCD(){
+  const realBrand=sBrand==='__custom__'?sCustomBrand:sBrand;
+  return{
+    name:document.getElementById('fNm')?.value||'',
+    phone:document.getElementById('fPh')?.value||'',
+    panggilan:spang||'Bapak',
+    brand:realBrand||'',
+    product:sProduct||realBrand||'kendaraan pilihan',
+    budget:document.getElementById('fBg')?.value||'',
+    src:ssrc,ref:document.getElementById('fRef')?.value||'',
+  };
+}
+function sapaan(c){return`${c.panggilan||'Bapak/Ibu'} ${c.name||''}`.trim()}
+function renderWA(){
+  const tpl=document.getElementById('waTpl').value;
+  document.getElementById('waCustomBox').style.display=tpl==='custom'?'block':'none';
+  const c=getCD();
+  let msg='';
+  if(tpl==='custom') msg=document.getElementById('waCustom')?.value||'';
+  else if(typeof WTPL[tpl]==='function') msg=WTPL[tpl](c);
+  else msg=WTPL[tpl]||'';
+  document.getElementById('waPrev').textContent=msg;
+}
+function openWA(){
+  const p=document.getElementById('fPh')?.value;
+  if(!p){toast('⚠️ No. HP belum diisi!','danger');return}
+  const m=document.getElementById('waPrev').textContent;
+  window.open(`https://wa.me/${waNum(p)}?text=${encodeURIComponent(m)}`,'_blank');
+}
+function copyWA(){cpText(document.getElementById('waPrev').textContent,'📋 Pesan di-copy!')}
+function copyDataCust(){
+  const c=getCD();
+  const prod=c.brand&&c.product?c.brand+' '+c.product:c.brand||c.product||'—';
+  cpText(`📋 DATA CUSTOMER — CRM\n${'━'.repeat(28)}\nPanggilan: ${c.panggilan}\nNama     : ${c.name}\nNo. HP   : ${c.phone}\nBrand    : ${c.brand||'—'}\nProduk   : ${c.product||'—'}\nBudget   : ${c.budget}\nSumber   : ${srcLbl(c.src)}\nReferral : ${c.ref||'-'}\nSales    : ${USER?.name||'-'}\nDealer   : ${USER?.dealer||'-'}\n${'━'.repeat(28)}`,'📋 Data customer di-copy!');
+}
+function qWA(id){
+  const c=C.find(x=>x.id===id);if(!c)return;
+  const msg=WTPL.fu1({...c,panggilan:c.panggilan||'Bapak'});
+  window.open(`https://wa.me/${waNum(c.phone)}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+function qCopy(id){
+  const c=C.find(x=>x.id===id);if(!c)return;
+  const prod=c.brand&&c.product?c.brand+' '+c.product:c.brand||c.product||'—';
+  cpText(`📋 DATA CUSTOMER — CRM\n${'━'.repeat(28)}\nPanggilan: ${c.panggilan||'—'}\nNama     : ${c.name}\nNo. HP   : ${c.phone}\nBrand    : ${c.brand||'—'}\nProduk   : ${c.product||'—'}\nBudget   : ${c.budget||'—'}\nSumber   : ${srcLbl(c.src)}\nStatus   : ${stLbl(c.status)}\nFU       : ${(c.followups||[]).length}x\nSales    : ${USER?.name||'-'}\n${'━'.repeat(28)}`,'📋 Data customer di-copy!');
+}
+function cpText(txt,msg){
+  navigator.clipboard.writeText(txt).then(()=>toast(msg,'success')).catch(()=>{
+    const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();toast(msg,'success');
+  });
+}
+
+// ══════════════════════════════════════════════
+// IMPORT
+// ══════════════════════════════════════════════
+function openImport(){impRows=[];document.getElementById('impPrev').style.display='none';document.getElementById('impFile').value='';document.getElementById('ovImp').classList.add('show')}
+function idov(e){e.preventDefault();document.getElementById('impZone').classList.add('drag')}
+function idrop(e){e.preventDefault();document.getElementById('impZone').classList.remove('drag');const f=e.dataTransfer.files[0];if(f)handleImpFile(f)}
+function procImp(e){const f=e.target.files[0];if(f)handleImpFile(f)}
+function handleImpFile(file){
+  const r=new FileReader();
+  r.onload=ev=>{
+    const txt=ev.target.result;
+    const lines=txt.split('\n').filter(l=>l.trim());
+    impRows=[];
+    const smap={'database':'database','referensi':'referensi','pameran':'pameran','iims':'iims','gjaw':'gjaw','giias':'giias'};
+    const stmap={'cold':'cold','warm':'warm','hot':'hot'};
+    for(let i=1;i<lines.length;i++){
+      const cols=lines[i].split(',').map(c=>c.replace(/^"|"$/g,'').trim());
+      impRows.push({
+        id:uid(),name:cols[0]||'',phone:cols[1]||'',product:cols[2]||'',budget:cols[3]||'',
+        src:smap[(cols[4]||'').toLowerCase()]||'database',
+        status:stmap[(cols[5]||'').toLowerCase()]||'cold',
+        date:cols[6]||today(),note:cols[7]||'',ref:'',followups:[],statusDate:today(),
+      });
+    }
+    document.getElementById('impCnt').textContent=impRows.length;
+    document.getElementById('impTbl').innerHTML=`<table class="rtbl"><thead><tr><th>Nama</th><th>No HP</th><th>Produk</th><th>Sumber</th><th>Status</th></tr></thead><tbody>${
+      impRows.slice(0,6).map(row=>`<tr><td>${esc(row.name)}</td><td>${esc(row.phone)}</td><td>${esc(row.product)}</td><td>${srcBadge(row.src)}</td><td><span class="badge ${row.status}">${stLbl(row.status)}</span></td></tr>`).join('')
+    }${impRows.length>6?`<tr><td colspan="5" style="color:var(--muted);text-align:center;font-size:.75rem">...dan ${impRows.length-6} baris lainnya</td></tr>`:''}</tbody></table>`;
+    document.getElementById('impPrev').style.display='block';
+  };
+  r.readAsText(file,'UTF-8');
+}
+function confirmImp(){if(!impRows.length)return;C.unshift(...impRows);sv();render();co('ovImp');toast(`✅ ${impRows.length} customer diimport!`,'success')}
+
+// ══════════════════════════════════════════════
+// EXPORT CSV
+// ══════════════════════════════════════════════
+function exportCSV(){
+  const data=C;
+  const hdr=['No','Nama','No HP','Produk','Budget','Sumber','Status','Tgl Masuk','Jml FU','Hasil FU Terakhir','Referral','Catatan','Sales','Dealer'];
+  const rows=data.map((c,i)=>[
+    i+1,c.name,c.phone,c.brand||'',c.product||'',getFullProduct(c),c.budget,srcLbl(c.src),
+    stLbl(c.status).replace(/[^\w\s]/g,'').trim(),
+    c.date,(c.followups||[]).length,
+    c.followups&&c.followups.length?c.followups[c.followups.length-1].result||'':'',
+    c.ref||'',c.note||'',USER?.name||'',USER?.dealer||'',
+  ]);
+  const csv=[hdr,...rows].map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const b=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`wuling-crm-${today()}.csv`;a.click();
+  toast('⬇️ CSV berhasil diunduh!','success');
+}
+
+// ══════════════════════════════════════════════
+// REPORT
+// ══════════════════════════════════════════════
+let repTab='monthly';
+function setRepTab(tab,el){
+  repTab=tab;
+  document.querySelectorAll('.rtab').forEach(b=>b.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.getElementById('repMonthFilter').style.display=tab==='monthly'?'block':'none';
+  document.getElementById('repDateFilter').style.display=tab==='fudate'?'block':'none';
+  buildReport();
+}
+
+function openReport(){
+  // Build month options
+  const sel=document.getElementById('repMonth');
+  sel.innerHTML='';
+  const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const now=new Date();
+  for(let y=now.getFullYear();y>=now.getFullYear()-1;y--){
+    for(let m=11;m>=0;m--){
+      if(y===now.getFullYear()&&m>now.getMonth()) continue;
+      const opt=document.createElement('option');
+      opt.value=`${y}-${String(m+1).padStart(2,'0')}`;
+      opt.textContent=`${months[m]} ${y}`;
+      sel.appendChild(opt);
+    }
+  }
+  document.getElementById('repDate').value=today();
+  repTab='monthly';
+  document.querySelectorAll('.rtab').forEach((b,i)=>b.classList.toggle('active',i===0));
+  document.getElementById('repMonthFilter').style.display='block';
+  document.getElementById('repDateFilter').style.display='none';
+  buildReport();
+  document.getElementById('ovRep').classList.add('show');
+}
+
+function buildReport(){
+  if(repTab==='monthly') buildMonthlyReport();
+  else buildFUDateReport();
+}
+
+function buildMonthlyReport(){
+  const ym=document.getElementById('repMonth').value||today().slice(0,7);
+  const [yr,mo]=ym.split('-').map(Number);
+  const inMonth=c=>c.date&&c.date.startsWith(ym);
+  const data=C.filter(inMonth);
+  const dl=data.filter(c=>c.status==='deal');
+  const ls=data.filter(c=>c.status==='lost');
+  const pr=data.filter(c=>c.status!=='deal'&&c.status!=='lost');
+  const cold=pr.filter(c=>c.status==='cold').length;
+  const warm=pr.filter(c=>c.status==='warm').length;
+  const hot=pr.filter(c=>c.status==='hot').length;
+  const totalFU=data.reduce((a,c)=>a+(c.followups||[]).length,0);
+  const conv=data.length?Math.round(dl.length/data.length*100):0;
+  const wl=data.filter(isWL).length;
+  // By source — dynamic
+  const bySrc={};
+  data.forEach(c=>{const k=c.src||'database';bySrc[k]=(bySrc[k]||0)+1});
+  const srcColors={'database':'var(--cold)','referensi':'var(--deal)','pameran':'var(--accent2)','iklan':'#d47bf0','web':'#5bdce8','sosmed':'#f06bb4'};
+  function getSrcColor(k){if(srcColors[k])return srcColors[k];if(k.startsWith('bigevent'))return'#ff6b80';return'#9ca3af'}
+  // By product
+  const byProd={};
+  data.forEach(c=>{ const fp=getFullProduct(c);if(fp&&fp!=='—')byProd[fp]=(byProd[fp]||0)+1 });
+  const bar=(v,mx,col)=>`<div class="pbar"><div class="pfill" style="width:${mx?Math.round(v/mx*100):0}%;background:${col}"></div></div>`;
+  const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+  document.getElementById('repContent').innerHTML=`
+  <h3 style="font-family:'DM Serif Display',serif;font-size:1rem;color:var(--muted);margin-bottom:14px">Laporan Bulan: ${months[mo-1]} ${yr} — ${USER?.dealer||'Wuling CRM'}</h3>
+
+  <div class="rs"><div class="rt">📈 Ringkasan Bulan Ini</div>
+  <div class="rg">
+    <div class="rc"><div class="rnum" style="color:var(--accent2)">${data.length}</div><div class="rlbl">Total Leads Masuk</div></div>
+    <div class="rc"><div class="rnum" style="color:var(--deal)">${dl.length} <small style="font-size:1rem">(${conv}%)</small></div><div class="rlbl">Total Deal</div></div>
+    <div class="rc"><div class="rnum" style="color:var(--hot)">${hot}</div><div class="rlbl">Hot Prospect</div></div>
+    <div class="rc"><div class="rnum" style="color:var(--warm)">${warm}</div><div class="rlbl">Warm Prospect</div></div>
+    <div class="rc"><div class="rnum" style="color:var(--cold)">${cold}</div><div class="rlbl">Cold Prospect</div></div>
+    <div class="rc"><div class="rnum" style="color:var(--lost)">${ls.length}</div><div class="rlbl">Lost</div></div>
+    <div class="rc"><div class="rnum" style="color:var(--accent3)">${totalFU}</div><div class="rlbl">Total Follow Up</div></div>
+    <div class="rc"><div class="rnum" style="color:var(--warn)">${wl}</div><div class="rlbl">Perlu Tindak Lanjut</div></div>
+    <div class="rc"><div class="rnum" style="color:var(--deal)">${data.length?Math.round(totalFU/data.length*10)/10:0}</div><div class="rlbl">Rata-rata FU/Customer</div></div>
+  </div></div>
+
+  <div class="rs"><div class="rt">📊 Per Sumber Leads</div>
+  <table class="rtbl"><thead><tr><th>Sumber</th><th>Jumlah Leads</th><th>Deal</th><th>Proporsi</th></tr></thead><tbody>
+  ${Object.entries(bySrc).sort((a,b)=>b[1]-a[1]).map(([k,cnt])=>{
+    const dcnt=dl.filter(c=>c.src===k).length;
+    return`<tr><td>${srcLbl(k)}</td><td><strong>${cnt}</strong></td><td>${dcnt}</td><td style="min-width:120px">${bar(cnt,data.length,getSrcColor(k))} ${data.length?Math.round(cnt/data.length*100):0}%</td></tr>`
+  }).join('')||'<tr><td colspan="4" style="color:var(--muted);text-align:center">Tidak ada data</td></tr>'}
+  </tbody></table></div>
+
+  <div class="rs"><div class="rt">🚗 Per Brand & Produk</div>
+  <table class="rtbl"><thead><tr><th>Model</th><th>Leads</th><th>Deal</th><th>Proporsi</th></tr></thead><tbody>
+  ${Object.entries(byProd).sort((a,b)=>b[1]-a[1]).map(([prod,cnt])=>{
+    const dcnt=dl.filter(c=>getFullProduct(c)===prod).length;
+    return`<tr><td>${esc(prod)}</td><td><strong>${cnt}</strong></td><td>${dcnt}</td><td style="min-width:120px">${bar(cnt,data.length,'var(--accent)')} ${data.length?Math.round(cnt/data.length*100):0}%</td></tr>`
+  }).join('')||'<tr><td colspan="4" style="color:var(--muted);text-align:center">Tidak ada data</td></tr>'}
+  </tbody></table></div>
+
+  <div class="rs"><div class="rt">✅ Detail Data Deal</div>
+  <table class="rtbl"><thead><tr><th>#</th><th>Nama</th><th>No HP</th><th>Brand</th><th>Produk</th><th>Budget</th><th>Sumber</th><th>Tgl Deal</th></tr></thead><tbody>
+  ${dl.length?dl.map((c,i)=>`<tr><td>${i+1}</td><td>${esc(c.name)}</td><td>${esc(c.phone)}</td><td>${esc(c.brand||'—')}</td><td>${esc(c.product||'—')}</td><td>${esc(c.budget||'—')}</td><td>${srcLbl(c.src)}</td><td>${fdate(c.statusDate||c.date)}</td></tr>`).join('')
+  :'<tr><td colspan="8" style="color:var(--muted);text-align:center">Tidak ada deal bulan ini</td></tr>'}
+  </tbody></table></div>
+
+  <div class="rs"><div class="rt">📋 Semua Customer Bulan Ini</div>
+  <table class="rtbl"><thead><tr><th>#</th><th>Nama</th><th>No HP</th><th>Brand</th><th>Produk</th><th>Budget</th><th>Sumber</th><th>Status</th><th>FU</th></tr></thead><tbody>
+  ${data.length?data.map((c,i)=>`<tr><td>${i+1}</td><td>${esc(c.name)}</td><td>${esc(c.phone)}</td><td>${esc(c.brand||'—')}</td><td>${esc(c.product||'—')}</td><td>${esc(c.budget||'—')}</td><td>${srcLbl(c.src)}</td><td>${stLbl(c.status).replace(/[^\w\s]/g,'').trim()}</td><td>${(c.followups||[]).length}</td></tr>`).join('')
+  :'<tr><td colspan="9" style="color:var(--muted);text-align:center">Tidak ada data bulan ini</td></tr>'}
+  </tbody></table></div>`;
+}
+
+function buildFUDateReport(){
+  const selDate=document.getElementById('repDate').value||today();
+  // All FU entries on that date
+  const entries=[];
+  C.forEach(c=>{
+    (c.followups||[]).forEach(f=>{
+      if(f.date===selDate) entries.push({customer:c,fu:f});
+    });
+  });
+  const responded=entries.filter(e=>e.fu.result==='responded'||e.fu.result==='interested'||e.fu.result==='callback'||e.fu.result==='deal').length;
+  const noResp=entries.filter(e=>e.fu.result==='noresponse').length;
+  const notInt=entries.filter(e=>e.fu.result==='notinterested').length;
+  const dealFU=entries.filter(e=>e.fu.result==='deal').length;
+  const fuLbl={responded:'✅ Merespons',interested:'🔥 Tertarik',noresponse:'📵 Tidak Merespons',callback:'📅 Callback',notinterested:'👎 Tidak Berminat',deal:'🤝 DEAL'};
+
+  document.getElementById('repContent').innerHTML=`
+  <h3 style="font-family:'DM Serif Display',serif;font-size:1rem;color:var(--muted);margin-bottom:14px">Laporan Follow Up — ${fdate(selDate)}</h3>
+  <div class="rs"><div class="rt">📞 Ringkasan Follow Up</div>
+  <div class="rg">
+    <div class="rc"><div class="rnum" style="color:var(--accent2)">${entries.length}</div><div class="rlbl">Total FU Hari Ini</div></div>
+    <div class="rc"><div class="rnum" style="color:var(--deal)">${responded}</div><div class="rlbl">Merespons / Tertarik</div></div>
+    <div class="rc"><div class="rnum" style="color:var(--warn)">${noResp}</div><div class="rlbl">Tidak Merespons</div></div>
+    <div class="rc"><div class="rnum" style="color:var(--lost)">${notInt}</div><div class="rlbl">Tidak Berminat</div></div>
+    <div class="rc"><div class="rnum" style="color:var(--deal)">${dealFU}</div><div class="rlbl">DEAL Hari Ini 🎉</div></div>
+    <div class="rc"><div class="rnum" style="color:var(--accent3)">${entries.length?Math.round(responded/entries.length*100):0}%</div><div class="rlbl">Response Rate</div></div>
+  </div></div>
+  <div class="rs"><div class="rt">📋 Detail Follow Up</div>
+  <table class="rtbl"><thead><tr><th>#</th><th>Nama Customer</th><th>No HP</th><th>Produk</th><th>Status</th><th>Hasil FU</th><th>Catatan FU</th></tr></thead><tbody>
+  ${entries.length?entries.map((e,i)=>`<tr>
+    <td>${i+1}</td>
+    <td>${esc(e.customer.name)}</td>
+    <td>${esc(e.customer.phone)}</td>
+    <td>${esc(e.customer.product||'—')}</td>
+    <td><span class="badge ${e.customer.status}">${stLbl(e.customer.status).replace(/[^\w\s]/g,'').trim()}</span></td>
+    <td>${fuLbl[e.fu.result]||e.fu.result||'—'}</td>
+    <td style="max-width:180px;font-size:.75rem">${esc(e.fu.note||'—')}</td>
+  </tr>`).join('')
+  :'<tr><td colspan="7" style="color:var(--muted);text-align:center;padding:20px">Tidak ada follow up pada tanggal ini</td></tr>'}
+  </tbody></table></div>`;
+}
+
+// ══════════════════════════════════════════════
+// EXPORT REPORT — EXCEL
+// ══════════════════════════════════════════════
+function exportRepExcel(){
+  const wb=XLSX.utils.book_new();
+  const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+  if(repTab==='monthly'){
+    const ym=document.getElementById('repMonth').value||today().slice(0,7);
+    const [yr,mo]=ym.split('-').map(Number);
+    const data=C.filter(c=>c.date&&c.date.startsWith(ym));
+    const dl=data.filter(c=>c.status==='deal');
+    const ls=data.filter(c=>c.status==='lost');
+    const pr=data.filter(c=>c.status!=='deal'&&c.status!=='lost');
+    const totalFU=data.reduce((a,c)=>a+(c.followups||[]).length,0);
+    const conv=data.length?Math.round(dl.length/data.length*100):0;
+
+    // Sheet 1: Ringkasan
+    const sum=[
+      ['LAPORAN WULING CRM — '+months[mo-1]+' '+yr],
+      ['Dealer / Showroom',USER?.dealer||''],
+      ['Sales',USER?.name||''],
+      ['Dibuat',new Date().toLocaleDateString('id-ID')],
+      [],
+      ['RINGKASAN'],
+      ['Total Leads',data.length],['Total Deal',dl.length],['Conversion Rate',conv+'%'],
+      ['Hot',pr.filter(c=>c.status==='hot').length],['Warm',pr.filter(c=>c.status==='warm').length],['Cold',pr.filter(c=>c.status==='cold').length],
+      ['Lost',ls.length],['Total Follow Up',totalFU],
+    ];
+    // By source — dynamic
+    sum.push([],['SUMBER LEADS'],['Sumber','Leads','Deal']);
+    const bySrcXL={};
+    data.forEach(c=>{const k=c.src||'database';bySrcXL[k]=(bySrcXL[k]||0)+1});
+    Object.entries(bySrcXL).sort((a,b)=>b[1]-a[1]).forEach(([k,cnt])=>{
+      const dcnt=dl.filter(c=>c.src===k).length;
+      sum.push([srcLbl(k).replace(/[^\w\s\-\/]/g,'').trim(),cnt,dcnt]);
+    });
+    const ws1=XLSX.utils.aoa_to_sheet(sum);
+    ws1['!cols']=[{wch:28},{wch:14},{wch:10}];
+    XLSX.utils.book_append_sheet(wb,ws1,'Ringkasan');
+
+    // Sheet 2: Semua Customer
+    const custHdr=['No','Nama','No HP','Brand','Produk','Brand+Produk','Budget','Sumber','Status','Tgl Masuk','Jml FU','Referral','Catatan'];
+    const custRows=data.map((c,i)=>[i+1,c.name,c.phone,c.brand||'',c.product||'',getFullProduct(c),c.budget||'',srcLbl(c.src).replace(/[^\w\s]/g,'').trim(),stLbl(c.status).replace(/[^\w\s]/g,'').trim(),c.date,(c.followups||[]).length,c.ref||'',c.note||'']);
+    const ws2=XLSX.utils.aoa_to_sheet([custHdr,...custRows]);
+    ws2['!cols']=[{wch:4},{wch:22},{wch:16},{wch:12},{wch:18},{wch:22},{wch:22},{wch:14},{wch:10},{wch:12},{wch:8},{wch:18},{wch:30}];
+    XLSX.utils.book_append_sheet(wb,ws2,'Semua Customer');
+
+    // Sheet 3: Deal
+    const dealHdr=['No','Nama','No HP','Brand','Produk','Brand+Produk','Budget','Sumber','Tgl Deal','FU Total'];
+    const dealRows=dl.map((c,i)=>[i+1,c.name,c.phone,c.brand||'',c.product||'',getFullProduct(c),c.budget||'',srcLbl(c.src).replace(/[^\w\s]/g,'').trim(),c.statusDate||c.date,(c.followups||[]).length]);
+    const ws3=XLSX.utils.aoa_to_sheet([dealHdr,...dealRows]);
+    ws3['!cols']=[{wch:4},{wch:22},{wch:16},{wch:12},{wch:18},{wch:22},{wch:22},{wch:14},{wch:12},{wch:8}];
+    XLSX.utils.book_append_sheet(wb,ws3,'Deal');
+
+    // Sheet 4: Detail Follow Up
+    const fuHdr=['No','Nama Customer','No HP','Brand','Produk','Status Customer','FU ke-','Tgl FU','Hasil FU','Catatan FU'];
+    const fuRows2=[];
+    let fuNo=1;
+    data.forEach(c=>{
+      (c.followups||[]).forEach((f,fi)=>{
+        const fuLbl2={responded:'Merespons',interested:'Tertarik',noresponse:'Tidak Merespons',callback:'Minta Callback',notinterested:'Tidak Berminat',deal:'DEAL'};
+        fuRows2.push([fuNo++,c.name,c.phone,c.brand||'',c.product||'',stLbl(c.status).replace(/[^\w\s]/g,'').trim(),fi+1,f.date,fuLbl2[f.result]||f.result,f.note||'']);
+      });
+    });
+    const ws4=XLSX.utils.aoa_to_sheet([fuHdr,...fuRows2]);
+    ws4['!cols']=[{wch:4},{wch:22},{wch:16},{wch:12},{wch:18},{wch:14},{wch:6},{wch:12},{wch:18},{wch:30}];
+    XLSX.utils.book_append_sheet(wb,ws4,'Detail Follow Up');
+
+    XLSX.writeFile(wb,`Laporan-Wuling-${months[mo-1]}-${yr}.xlsx`);
+    toast('📊 Excel berhasil diunduh!','success');
+
+  } else {
+    // FU by date
+    const selDate=document.getElementById('repDate').value||today();
+    const fuHdr=['No','Nama Customer','No HP','Brand','Produk','Status Customer','Hasil FU','Catatan FU'];
+    const fuRows2=[];
+    let fuNo=1;
+    C.forEach(c=>{
+      (c.followups||[]).filter(f=>f.date===selDate).forEach(f=>{
+        const fuLbl2={responded:'Merespons',interested:'Tertarik',noresponse:'Tidak Merespons',callback:'Minta Callback',notinterested:'Tidak Berminat',deal:'DEAL'};
+        fuRows2.push([fuNo++,c.name,c.phone,c.brand||'',c.product||'',stLbl(c.status).replace(/[^\w\s]/g,'').trim(),fuLbl2[f.result]||f.result,f.note||'']);
+      });
+    });
+    const ws=XLSX.utils.aoa_to_sheet([
+      ['LAPORAN FOLLOW UP — '+fdate(selDate)],['Dealer',USER?.dealer||''],['Sales',USER?.name||''],[],
+      fuHdr,...fuRows2
+    ]);
+    ws['!cols']=[{wch:4},{wch:22},{wch:16},{wch:12},{wch:18},{wch:14},{wch:18},{wch:35}];
+    XLSX.utils.book_append_sheet(wb,ws,'Follow Up');
+    XLSX.writeFile(wb,`Laporan-FU-${selDate}.xlsx`);
+    toast('📊 Excel FU berhasil diunduh!','success');
+  }
+}
+
+// ══════════════════════════════════════════════
+// EXPORT REPORT — PDF (browser print)
+// ══════════════════════════════════════════════
+function exportRepPDF(){
+  const content=document.getElementById('repContent').innerHTML;
+  const sales=USER?.name||'';const dealer=USER?.dealer||'';
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Laporan Wuling CRM</title>\n  <${'style'}>\n    body{font-family:Arial,sans-serif;font-size:11px;color:#000;margin:24px}\n    h1{font-size:16px;margin-bottom:4px} .sub{color:#555;font-size:10px;margin-bottom:18px}\n    h3{font-size:12px;color:#666;margin-bottom:10px}\n    .rg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}\n    .rc{border:1px solid #ddd;border-radius:6px;padding:10px;text-align:left}\n    .rnum{font-size:22px;font-weight:700;line-height:1} .rlbl{font-size:9px;color:#888;margin-top:2px}\n    table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:10px}\n    th{background:#f0f0f0;padding:6px 8px;text-align:left;font-size:9px;text-transform:uppercase}\n    td{padding:6px 8px;border-top:1px solid #eee}\n    tr:nth-child(even) td{background:#fafafa}\n    .rs{margin-bottom:16px} .rt{font-size:9px;font-weight:700;text-transform:uppercase;color:#888;margin-bottom:8px}\n    .pbar,.pfill{height:4px;border-radius:2px}\n    .pbar{background:#eee;overflow:hidden} .pfill{background:#c8102e}\n    .badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;background:#eee}\n    @media print{body{margin:12px}h1{page-break-before:avoid}}\n  </${'style'}></${'head'}><${'body'}>\n  <h1>📊 Laporan Wuling CRM</h1>\n  <div class="sub">${dealer} &nbsp;|&nbsp; Sales: ${sales} &nbsp;|&nbsp; Dicetak: ${new Date().toLocaleDateString('id-ID',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>\n  ${content}\n  <${'script'}>window.onload=function(){window.print()}</${'script'}>\n  </${'body'}></${'html'}>`);
+  w.document.close();
+}
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+let tt;
+function toast(msg,type='success'){const e=document.getElementById('toast');e.textContent=msg;e.className='toast show '+type;clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('show'),2800)}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+if(USER){document.getElementById('setupScreen').style.display='none';applyUser()}
+render();
+</script>
+<script>
+try {
+  var __js = document.getElementById("mainjs").textContent;
+  (new Function(__js))();
+} catch(e) {
+  console.error('CRM Load Error:', e);
+  document.body.innerHTML += '<div style="position:fixed;bottom:0;left:0;right:0;background:#c8102e;color:#fff;padding:16px;font-family:sans-serif;font-size:14px;z-index:9999">Error: '+e.message+'</div>';
+}
+</script>
+
+</body>
+</html>

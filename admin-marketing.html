@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Marketing — Wuling CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0c10;--surface:#111318;--surface2:#181c26;--surface3:#1e2230;
+  --border:#22273a;--border2:#2a3048;
+  --accent:#c8102e;--accent2:#e8a44a;--accent3:#5b8dee;
+  --text:#e8eaf0;--muted:#6b7280;
+  --success:#4ec97b;--warn:#f0b429;--danger:#e05c5c;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(200,16,46,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(200,16,46,.03) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:0 16px}
+header{border-bottom:1px solid var(--border);padding:12px 0;backdrop-filter:blur(14px);background:rgba(10,12,16,.9);position:sticky;top:0;z-index:100}
+.hi{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.bl{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#a0001e);display:grid;place-items:center;font-size:14px}
+.brand h1{font-family:'DM Serif Display',serif;font-size:1.15rem}
+.brand span{color:var(--muted);font-size:.7rem;display:block}
+.ha{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.btn{padding:8px 14px;border-radius:8px;font-size:.79rem;font-weight:600;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .16s;white-space:nowrap;font-family:inherit}
+.btn-p{background:linear-gradient(135deg,var(--accent),#a0001e);color:#fff}.btn-p:hover{opacity:.88}
+.btn-g{background:var(--surface);border:1px solid var(--border);color:var(--text)}.btn-g:hover{border-color:var(--accent2)}
+
+/* MAIN TABS */
+.main-nav{display:flex;gap:4px;padding:14px 0 0;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto}
+.main-nav::-webkit-scrollbar{height:0}
+.mnav{padding:9px 18px;font-size:.83rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .18s;white-space:nowrap;border-radius:4px 4px 0 0;flex-shrink:0}
+.mnav.active{color:var(--accent2);border-bottom-color:var(--accent2);background:rgba(232,164,74,.06)}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.tb-title{font-family:'DM Serif Display',serif;font-size:1.1rem;flex:1}
+
+/* BRAND TABS */
+.brand-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.btab{padding:7px 14px;border-radius:20px;font-size:.76rem;font-weight:600;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;transition:all .16s;color:var(--muted);display:flex;align-items:center;gap:5px}
+.btab.active{border-color:var(--accent2);background:rgba(232,164,74,.12);color:var(--accent2)}
+.bico{width:20px;height:20px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:800;flex-shrink:0}
+.blog-wuling{background:linear-gradient(135deg,#c8102e,#8b0018);color:#fff}
+.blog-mg{background:linear-gradient(135deg,#cc0000,#880000);color:#fff}
+.blog-geely{background:linear-gradient(135deg,#003087,#001a5c);color:#fff}
+.blog-hyundai{background:linear-gradient(135deg,#002c5f,#001830);color:#c8a951}
+.blog-mazda{background:linear-gradient(135deg,#1a1a1a,#555);color:#fff}
+.blog-jetour{background:linear-gradient(135deg,#00923f,#005c27);color:#fff}
+.blog-gwm{background:linear-gradient(135deg,#e30613,#9e0000);color:#fff}
+
+/* ADMIN TABLE */
+.admin-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.admin-table-wrap table{width:100%;border-collapse:collapse;font-size:.82rem}
+.admin-table-wrap thead{background:var(--surface2)}
+.admin-table-wrap thead th{padding:10px 14px;text-align:left;font-size:.67rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;white-space:nowrap}
+.admin-table-wrap tbody tr{border-top:1px solid var(--border);transition:background .12s}
+.admin-table-wrap tbody tr:hover{background:var(--surface2)}
+.admin-table-wrap tbody td{padding:10px 14px;vertical-align:middle}
+.preview-thumb{width:48px;height:36px;border-radius:6px;object-fit:cover;background:var(--surface3)}
+.pdf-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:.67rem;font-weight:700;background:rgba(200,16,46,.15);color:#ff6b80;border:1px solid rgba(200,16,46,.3)}
+.img-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:.67rem;font-weight:700;background:rgba(91,141,238,.15);color:#7ba7f5;border:1px solid rgba(91,141,238,.3)}
+.row-actions{display:flex;gap:5px;flex-wrap:nowrap}
+.ra{padding:5px 10px;border-radius:6px;font-size:.72rem;font-weight:600;border:1px solid var(--border);background:none;cursor:pointer;color:var(--muted);transition:all .13s;font-family:inherit;white-space:nowrap}
+.ra:hover.edit{border-color:var(--accent2);color:var(--accent2);background:rgba(232,164,74,.1)}
+.ra:hover.del{border-color:var(--danger);color:var(--danger);background:rgba(224,92,92,.1)}
+.ra:hover.view{border-color:var(--accent3);color:var(--accent3);background:rgba(91,141,238,.1)}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:52px 20px;color:var(--muted)}
+.empty-state .ic{font-size:2.5rem;margin-bottom:10px}
+
+/* OVERLAY / MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(5px);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto}
+.overlay.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:100%;max-width:640px;padding:24px;animation:su .22s ease;margin:auto}
+.modal.wide{max-width:800px}
+@keyframes su{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.mt{font-family:'DM Serif Display',serif;font-size:1.1rem}
+.mc{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-size:.85rem;transition:all .14s}
+.mc:hover{color:var(--danger);border-color:var(--danger)}
+
+/* FORM */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.f{display:flex;flex-direction:column;gap:4px}
+.f.full{grid-column:1/-1}
+.f label{font-size:.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.f input,.f select,.f textarea{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:9px 11px;font-family:inherit;font-size:.86rem;color:var(--text);outline:none;transition:border-color .2s;width:100%}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--accent2)}
+.f select option{background:var(--surface2)}
+.f textarea{resize:vertical;min-height:60px}
+
+/* FILE DROP ZONE */
+.dropzone{border:2px dashed var(--border2);border-radius:11px;padding:28px;text-align:center;cursor:pointer;transition:all .18s;color:var(--muted);position:relative}
+.dropzone:hover,.dropzone.drag{border-color:var(--accent3);background:rgba(91,141,238,.04);color:var(--text)}
+.dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.dropzone .dz-icon{font-size:2rem;margin-bottom:6px}
+.dropzone p{font-size:.82rem}
+.dropzone small{font-size:.72rem;color:var(--muted);margin-top:3px;display:block}
+.file-preview{margin-top:12px;display:flex;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px}
+.fp-thumb{width:56px;height:42px;border-radius:6px;object-fit:cover;flex-shrink:0}
+.fp-info{flex:1;min-width:0}
+.fp-name{font-size:.82rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fp-size{font-size:.72rem;color:var(--muted)}
+.fp-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem;flex-shrink:0;padding:0}
+.fp-del:hover{color:var(--danger)}
+
+/* GALLERY FORM — multi image */
+.img-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:8px}
+.img-slot{aspect-ratio:4/3;border-radius:8px;border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;overflow:hidden;position:relative;background:var(--surface2)}
+.img-slot:hover{border-color:var(--accent3)}
+.img-slot img{width:100%;height:100%;object-fit:cover}
+.img-slot .del-img{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(224,92,92,.8);color:#fff;border:none;cursor:pointer;font-size:.7rem;display:none;align-items:center;justify-content:center}
+.img-slot:hover .del-img{display:flex}
+.img-slot.add-btn{border-style:dashed;color:var(--muted);flex-direction:column;gap:3px;font-size:.72rem}
+.img-slot.add-btn:hover{color:var(--accent3);border-color:var(--accent3)}
+
+.ma{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.bcn{padding:8px 16px;border-radius:7px;background:none;border:1px solid var(--border);color:var(--muted);font-family:inherit;font-size:.82rem;cursor:pointer;transition:border-color .2s}
+.bcn:hover{border-color:var(--text);color:var(--text)}
+.bsv{padding:8px 20px;border-radius:7px;background:linear-gradient(135deg,var(--accent),#a0001e);color:#fff;border:none;font-family:inherit;font-weight:700;font-size:.82rem;cursor:pointer;transition:opacity .2s}
+.bsv:hover{opacity:.88}
+
+/* TOAST */
+.toast{position:fixed;bottom:18px;right:18px;z-index:300;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 16px;font-size:.82rem;display:flex;align-items:center;gap:7px;transform:translateY(70px);opacity:0;transition:all .28s ease;box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:var(--success)}.toast.danger{border-color:var(--danger)}.toast.warn{border-color:var(--warn)}
+
+/* STATS BAR */
+.stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.stat .num{font-family:'DM Serif Display',serif;font-size:2rem;line-height:1;color:var(--accent2)}
+.stat .lbl{font-size:.72rem;color:var(--muted);margin-top:2px}
+
+@media(max-width:640px){.fg{grid-template-columns:1fr}.stats-bar{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<header>
+<div class="wrap hi">
+  <div class="brand">
+    <div class="bl">⚙️</div>
+    <div><h1>Admin Marketing</h1><span>Kelola Katalog, Galeri & Pricelist</span></div>
+  </div>
+  <div class="ha">
+    <button class="btn btn-g" onclick="window.location='customer-database.html'">← CRM</button>
+    <button class="btn btn-g" onclick="window.location='marketing-tools.html'">🎯 Marketing Tools</button>
+  </div>
+</div>
+</header>
+
+<div class="wrap">
+<div class="main-nav">
+  <div class="mnav active" onclick="setTab('catalog',this)">📋 Katalog</div>
+  <div class="mnav" onclick="setTab('gallery',this)">🚗 Galeri Mobil</div>
+  <div class="mnav" onclick="setTab('pricelist',this)">💰 Pricelist</div>
+</div>
+
+<!-- CATALOG -->
+<div id="tab-catalog">
+  <div class="stats-bar">
+    <div class="stat"><div class="num" id="stat-cat-total">0</div><div class="lbl">Total Katalog</div></div>
+    <div class="stat"><div class="num" id="stat-cat-pdf">0</div><div class="lbl">File PDF</div></div>
+    <div class="stat"><div class="num" id="stat-cat-img">0</div><div class="lbl">Gambar</div></div>
+  </div>
+  <div class="toolbar">
+    <div class="tb-title">📋 Manajemen Katalog</div>
+    <button class="btn btn-p" onclick="openAddCatalog()">＋ Tambah Katalog</button>
+  </div>
+  <div class="brand-tabs" id="catBrandTabs">
+    <div class="btab active" data-brand="all" onclick="setCatBrand('all',this)">🌐 Semua</div>
+    <div class="btab" data-brand="Wuling" onclick="setCatBrand('Wuling',this)"><span class="bico blog-wuling">WL</span>Wuling</div>
+    <div class="btab" data-brand="MG" onclick="setCatBrand('MG',this)"><span class="bico blog-mg">MG</span>MG</div>
+    <div class="btab" data-brand="Geely" onclick="setCatBrand('Geely',this)"><span class="bico blog-geely">GL</span>Geely</div>
+    <div class="btab" data-brand="Hyundai" onclick="setCatBrand('Hyundai',this)"><span class="bico blog-hyundai">HY</span>Hyundai</div>
+    <div class="btab" data-brand="Mazda" onclick="setCatBrand('Mazda',this)"><span class="bico blog-mazda">MZ</span>Mazda</div>
+    <div class="btab" data-brand="Jetour" onclick="setCatBrand('Jetour',this)"><span class="bico blog-jetour">JT</span>Jetour</div>
+    <div class="btab" data-brand="GWM" onclick="setCatBrand('GWM',this)"><span class="bico blog-gwm">GW</span>GWM</div>
+  </div>
+  <div class="admin-table-wrap" id="catTableWrap"></div>
+  <div id="catEmpty" class="empty-state" style="display:none"><div class="ic">📋</div><p>Belum ada katalog. Klik <strong>+ Tambah Katalog</strong>.</p></div>
+</div>
+
+<!-- GALLERY -->
+<div id="tab-gallery" style="display:none">
+  <div class="stats-bar">
+    <div class="stat"><div class="num" id="stat-gal-total">0</div><div class="lbl">Total Model</div></div>
+    <div class="stat"><div class="num" id="stat-gal-varian">0</div><div class="lbl">Total Varian</div></div>
+    <div class="stat"><div class="num" id="stat-gal-img">0</div><div class="lbl">Total Foto</div></div>
+  </div>
+  <div class="toolbar">
+    <div class="tb-title">🚗 Manajemen Galeri Mobil</div>
+    <button class="btn btn-p" onclick="openAddGallery()">＋ Tambah Galeri</button>
+  </div>
+  <div class="brand-tabs" id="galBrandTabs">
+    <div class="btab active" data-brand="all" onclick="setGalBrand('all',this)">🌐 Semua</div>
+    <div class="btab" data-brand="Wuling" onclick="setGalBrand('Wuling',this)"><span class="bico blog-wuling">WL</span>Wuling</div>
+    <div class="btab" data-brand="MG" onclick="setGalBrand('MG',this)"><span class="bico blog-mg">MG</span>MG</div>
+    <div class="btab" data-brand="Geely" onclick="setGalBrand('Geely',this)"><span class="bico blog-geely">GL</span>Geely</div>
+    <div class="btab" data-brand="Hyundai" onclick="setGalBrand('Hyundai',this)"><span class="bico blog-hyundai">HY</span>Hyundai</div>
+    <div class="btab" data-brand="Mazda" onclick="setGalBrand('Mazda',this)"><span class="bico blog-mazda">MZ</span>Mazda</div>
+    <div class="btab" data-brand="Jetour" onclick="setGalBrand('Jetour',this)"><span class="bico blog-jetour">JT</span>Jetour</div>
+    <div class="btab" data-brand="GWM" onclick="setGalBrand('GWM',this)"><span class="bico blog-gwm">GW</span>GWM</div>
+  </div>
+  <div class="admin-table-wrap" id="galTableWrap"></div>
+  <div id="galEmpty" class="empty-state" style="display:none"><div class="ic">🚗</div><p>Belum ada galeri. Klik <strong>+ Tambah Galeri</strong>.</p></div>
+</div>
+
+<!-- PRICELIST -->
+<div id="tab-pricelist" style="display:none">
+  <div class="stats-bar">
+    <div class="stat"><div class="num" id="stat-pl-total">0</div><div class="lbl">Total Pricelist</div></div>
+    <div class="stat"><div class="num" id="stat-pl-pdf">0</div><div class="lbl">File PDF</div></div>
+    <div class="stat"><div class="num" id="stat-pl-img">0</div><div class="lbl">Gambar</div></div>
+  </div>
+  <div class="toolbar">
+    <div class="tb-title">💰 Manajemen Pricelist</div>
+    <button class="btn btn-p" onclick="openAddPricelist()">＋ Tambah Pricelist</button>
+  </div>
+  <div class="brand-tabs" id="plBrandTabs">
+    <div class="btab active" data-brand="all" onclick="setPlBrand('all',this)">🌐 Semua</div>
+    <div class="btab" data-brand="Wuling" onclick="setPlBrand('Wuling',this)"><span class="bico blog-wuling">WL</span>Wuling</div>
+    <div class="btab" data-brand="MG" onclick="setPlBrand('MG',this)"><span class="bico blog-mg">MG</span>MG</div>
+    <div class="btab" data-brand="Geely" onclick="setPlBrand('Geely',this)"><span class="bico blog-geely">GL</span>Geely</div>
+    <div class="btab" data-brand="Hyundai" onclick="setPlBrand('Hyundai',this)"><span class="bico blog-hyundai">HY</span>Hyundai</div>
+    <div class="btab" data-brand="Mazda" onclick="setPlBrand('Mazda',this)"><span class="bico blog-mazda">MZ</span>Mazda</div>
+    <div class="btab" data-brand="Jetour" onclick="setPlBrand('Jetour',this)"><span class="bico blog-jetour">JT</span>Jetour</div>
+    <div class="btab" data-brand="GWM" onclick="setPlBrand('GWM',this)"><span class="bico blog-gwm">GW</span>GWM</div>
+  </div>
+  <div class="admin-table-wrap" id="plTableWrap"></div>
+  <div id="plEmpty" class="empty-state" style="display:none"><div class="ic">💰</div><p>Belum ada pricelist. Klik <strong>+ Tambah Pricelist</strong>.</p></div>
+</div>
+</div>
+
+<!-- MODAL CATALOG / PRICELIST -->
+<div class="overlay" id="ovFile" onclick="obg(event,'ovFile')">
+<div class="modal wide">
+  <div class="mh"><div class="mt" id="fileModalTitle">Tambah Katalog</div><button class="mc" onclick="co('ovFile')">✕</button></div>
+  <div class="fg">
+    <div class="f"><label>Brand *</label>
+      <select id="fmBrand" onchange="fmBrandChange()">
+        <option value="">— Pilih Brand —</option>
+        <option>Wuling</option><option>MG</option><option>Geely</option>
+        <option>Hyundai</option><option>Mazda</option><option>Jetour</option><option>GWM</option>
+        <option value="__custom__">+ Brand Lainnya</option>
+      </select>
+    </div>
+    <div class="f" id="fmCustomBrandWrap" style="display:none"><label>Nama Brand *</label><input type="text" id="fmCustomBrand" placeholder="Nama brand lainnya..."></div>
+    <div class="f full"><label>Judul *</label><input type="text" id="fmTitle" placeholder="Contoh: Katalog Wuling 2025"></div>
+    <div class="f full"><label>Deskripsi</label><textarea id="fmDesc" placeholder="Deskripsi singkat..."></textarea></div>
+    <div class="f full"><label>Upload File (PDF atau Gambar) *</label>
+      <div class="dropzone" id="fmDropzone" ondragover="dzDrag(event,'fmDropzone')" ondragleave="dzLeave('fmDropzone')" ondrop="dzDrop(event,'fmFile','fmDropzone')">
+        <input type="file" id="fmFile" accept=".pdf,image/*" onchange="handleFile('fmFile','fmDropzone','fmPreview')">
+        <div class="dz-icon">📎</div>
+        <p>Klik atau drag file ke sini</p>
+        <small>Format: PDF, JPG, PNG, WEBP (maks. 10MB)</small>
+      </div>
+      <div id="fmPreview" style="display:none"></div>
+    </div>
+  </div>
+  <div class="ma"><button class="bcn" onclick="co('ovFile')">Batal</button><button class="bsv" onclick="saveFile()">💾 Simpan</button></div>
+</div>
+</div>
+
+<!-- MODAL GALLERY -->
+<div class="overlay" id="ovGal" onclick="obg(event,'ovGal')">
+<div class="modal wide">
+  <div class="mh"><div class="mt" id="galModalTitle">Tambah Galeri Mobil</div><button class="mc" onclick="co('ovGal')">✕</button></div>
+  <div class="fg">
+    <div class="f"><label>Brand *</label>
+      <select id="gmBrand" onchange="gmBrandChange()">
+        <option value="">— Pilih Brand —</option>
+        <option>Wuling</option><option>MG</option><option>Geely</option>
+        <option>Hyundai</option><option>Mazda</option><option>Jetour</option><option>GWM</option>
+        <option value="__custom__">+ Brand Lainnya</option>
+      </select>
+    </div>
+    <div class="f" id="gmCustomBrandWrap" style="display:none"><label>Nama Brand *</label><input type="text" id="gmCustomBrand" placeholder="Nama brand lainnya..."></div>
+    <div class="f"><label>Nama Model *</label><input type="text" id="gmModel" placeholder="Contoh: Air ev, BinguoEV..."></div>
+    <div class="f"><label>Type / Varian</label><input type="text" id="gmType" placeholder="Contoh: Standard, Premium, Pro..."></div>
+    <div class="f"><label>Warna</label><input type="text" id="gmColor" placeholder="Contoh: Putih, Hitam, Biru..."></div>
+    <div class="f full"><label>Foto Galeri (bisa beberapa — untuk 360°)</label>
+      <small style="font-size:.74rem;color:var(--muted);margin-bottom:8px;display:block">Upload minimal 4-8 foto dari berbagai sudut untuk efek 360°</small>
+      <div class="img-slots" id="gmSlots"></div>
+      <input type="file" id="gmFileInput" accept="image/*" multiple style="display:none" onchange="handleGalleryImages(event)">
+    </div>
+  </div>
+  <div class="ma"><button class="bcn" onclick="co('ovGal')">Batal</button><button class="bsv" onclick="saveGallery()">💾 Simpan</button></div>
+</div>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div class="overlay" id="ovPreview" onclick="obg(event,'ovPreview')">
+<div class="modal" style="max-width:820px">
+  <div class="mh"><div class="mt" id="prevTitle">Preview</div><button class="mc" onclick="co('ovPreview')">✕</button></div>
+  <div id="prevBody" style="padding:4px 0"></div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="text/plain" id="mainjs">
+// ── DATA ──
+function getData(key){return JSON.parse(localStorage.getItem('mkt_'+key)||'[]')}
+function saveData(key,arr){localStorage.setItem('mkt_'+key,JSON.stringify(arr))}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
+function today(){return new Date().toISOString().split('T')[0]}
+function fdate(d){if(!d)return'—';const[y,m,dy]=d.split('-');const M=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];return dy+' '+M[+m-1]+' '+y}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// ── TABS ──
+let curTab='catalog';
+let curBrand={catalog:'all',gallery:'all',pricelist:'all'};
+let fileMode='catalog'; // catalog or pricelist
+let editId=null;
+let galImages=[];
+
+function setTab(tab,el){
+  curTab=tab;
+  document.querySelectorAll('.mnav').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');
+  ['catalog','gallery','pricelist'].forEach(t=>{
+    const el2=document.getElementById('tab-'+t);
+    if(el2)el2.style.display=t===tab?'block':'none';
+  });
+  renderAll();
+}
+
+// ── BRAND FILTERS ──
+function setCatBrand(b,el){curBrand.catalog=b;updateBrandTab('catBrandTabs',el);renderCatalog()}
+function setGalBrand(b,el){curBrand.gallery=b;updateBrandTab('galBrandTabs',el);renderGallery()}
+function setPlBrand(b,el){curBrand.pricelist=b;updateBrandTab('plBrandTabs',el);renderPricelist()}
+function updateBrandTab(tabsId,el){
+  document.getElementById(tabsId).querySelectorAll('.btab').forEach(b=>b.classList.remove('active'));
+  if(el)el.classList.add('active');
+}
+
+// ── RENDER ALL ──
+function renderAll(){renderCatalog();renderGallery();renderPricelist()}
+
+// ── CATALOG ──
+function renderCatalog(){
+  const all=getData('catalog');
+  const b=curBrand.catalog;
+  const data=b==='all'?all:all.filter(d=>d.brand===b);
+  document.getElementById('stat-cat-total').textContent=all.length;
+  document.getElementById('stat-cat-pdf').textContent=all.filter(d=>d.type==='pdf').length;
+  document.getElementById('stat-cat-img').textContent=all.filter(d=>d.type!=='pdf').length;
+  const wrap=document.getElementById('catTableWrap'),empty=document.getElementById('catEmpty');
+  if(!data.length){wrap.innerHTML='';empty.style.display='';return}
+  empty.style.display='none';
+  wrap.innerHTML=`<div style="overflow-x:auto"><table>
+    <thead><tr><th>Preview</th><th>Judul</th><th>Brand</th><th>Format</th><th>Tanggal</th><th>Aksi</th></tr></thead>
+    <tbody>${data.map(item=>{
+      const thumb=item.type==='pdf'
+        ?`<div class="pdf-badge" style="width:48px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:1.2rem">📄</div>`
+        :`<img class="preview-thumb" src="${item.fileData}" alt="${item.title}" onerror="this.src=''">`;
+      return`<tr>
+        <td>${thumb}</td>
+        <td><div style="font-weight:600;font-size:.85rem">${esc(item.title)}</div><div style="font-size:.74rem;color:var(--muted)">${esc(item.desc||'')}</div></td>
+        <td><span style="font-size:.78rem;font-weight:600">${esc(item.brand)}</span></td>
+        <td>${item.type==='pdf'?'<span class="pdf-badge">PDF</span>':'<span class="img-badge">IMG</span>'}</td>
+        <td style="font-size:.78rem;color:var(--muted)">${fdate(item.date)}</td>
+        <td><div class="row-actions">
+          <button class="ra view" onclick="previewItem('${item.id}','catalog')">👁 Lihat</button>
+          <button class="ra edit" onclick="editCatalog('${item.id}')">✏️ Edit</button>
+          <button class="ra del" onclick="delItem('${item.id}','catalog')">🗑 Hapus</button>
+        </div></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+}
+
+// ── GALLERY ──
+function renderGallery(){
+  const all=getData('gallery');
+  const b=curBrand.gallery;
+  const data=b==='all'?all:all.filter(d=>d.brand===b);
+  const models=new Set(all.map(d=>d.brand+'-'+d.model));
+  const totalImgs=all.reduce((a,d)=>a+(d.images||[]).length,0);
+  document.getElementById('stat-gal-total').textContent=models.size;
+  document.getElementById('stat-gal-varian').textContent=all.length;
+  document.getElementById('stat-gal-img').textContent=totalImgs;
+  const wrap=document.getElementById('galTableWrap'),empty=document.getElementById('galEmpty');
+  if(!data.length){wrap.innerHTML='';empty.style.display='';return}
+  empty.style.display='none';
+  wrap.innerHTML=`<div style="overflow-x:auto"><table>
+    <thead><tr><th>Cover</th><th>Model</th><th>Brand</th><th>Type / Warna</th><th>Foto</th><th>Aksi</th></tr></thead>
+    <tbody>${data.map(item=>{
+      const cover=item.images&&item.images.length?`<img class="preview-thumb" src="${item.images[0].data}" alt="${item.model}">`:`<div style="width:48px;height:36px;border-radius:6px;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:1rem">🚗</div>`;
+      return`<tr>
+        <td>${cover}</td>
+        <td><div style="font-weight:600;font-size:.85rem">${esc(item.model)}</div></td>
+        <td><span style="font-size:.78rem;font-weight:600">${esc(item.brand)}</span></td>
+        <td><div style="font-size:.78rem">${esc(item.type||'Standard')}</div><div style="font-size:.72rem;color:var(--muted)">${esc(item.color||'—')}</div></td>
+        <td><span style="font-size:.78rem;color:var(--muted)">${(item.images||[]).length} foto</span></td>
+        <td><div class="row-actions">
+          <button class="ra view" onclick="previewGallery('${item.id}')">👁 Lihat</button>
+          <button class="ra edit" onclick="editGallery('${item.id}')">✏️ Edit</button>
+          <button class="ra del" onclick="delItem('${item.id}','gallery')">🗑 Hapus</button>
+        </div></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+}
+
+// ── PRICELIST ──
+function renderPricelist(){
+  const all=getData('pricelist');
+  const b=curBrand.pricelist;
+  const data=b==='all'?all:all.filter(d=>d.brand===b);
+  document.getElementById('stat-pl-total').textContent=all.length;
+  document.getElementById('stat-pl-pdf').textContent=all.filter(d=>d.type==='pdf').length;
+  document.getElementById('stat-pl-img').textContent=all.filter(d=>d.type!=='pdf').length;
+  const wrap=document.getElementById('plTableWrap'),empty=document.getElementById('plEmpty');
+  if(!data.length){wrap.innerHTML='';empty.style.display='';return}
+  empty.style.display='none';
+  wrap.innerHTML=`<div style="overflow-x:auto"><table>
+    <thead><tr><th>Preview</th><th>Judul</th><th>Brand</th><th>Format</th><th>Tanggal</th><th>Aksi</th></tr></thead>
+    <tbody>${data.map(item=>{
+      const thumb=item.type==='pdf'
+        ?`<div style="width:48px;height:36px;border-radius:6px;background:rgba(200,16,46,.1);display:flex;align-items:center;justify-content:center;font-size:1.2rem">💰</div>`
+        :`<img class="preview-thumb" src="${item.fileData}" alt="${item.title}" onerror="this.src=''">`;
+      return`<tr>
+        <td>${thumb}</td>
+        <td><div style="font-weight:600;font-size:.85rem">${esc(item.title)}</div><div style="font-size:.74rem;color:var(--muted)">${esc(item.desc||'')}</div></td>
+        <td><span style="font-size:.78rem;font-weight:600">${esc(item.brand)}</span></td>
+        <td>${item.type==='pdf'?'<span class="pdf-badge">PDF</span>':'<span class="img-badge">IMG</span>'}</td>
+        <td style="font-size:.78rem;color:var(--muted)">${fdate(item.date)}</td>
+        <td><div class="row-actions">
+          <button class="ra view" onclick="previewItem('${item.id}','pricelist')">👁 Lihat</button>
+          <button class="ra edit" onclick="editPricelist('${item.id}')">✏️ Edit</button>
+          <button class="ra del" onclick="delItem('${item.id}','pricelist')">🗑 Hapus</button>
+        </div></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table></div>`;
+}
+
+// ── DELETE ──
+function delItem(id,type){
+  const data=getData(type);
+  const item=data.find(d=>d.id===id);
+  if(!item||!confirm('Hapus "'+item.title+(item.model||'')+'"? Tindakan ini tidak bisa dibatalkan.')) return;
+  saveData(type,data.filter(d=>d.id!==id));
+  renderAll();toast('🗑 Data berhasil dihapus.','warn');
+}
+
+// ── CATALOG ADD/EDIT ──
+let fmFileData=null, fmFileType=null;
+
+function openAddCatalog(){
+  fileMode='catalog';
+  editId=null;fmFileData=null;fmFileType=null;
+  document.getElementById('fileModalTitle').textContent='Tambah Katalog';
+  document.getElementById('fmBrand').value='';
+  document.getElementById('fmCustomBrand').value='';
+  document.getElementById('fmCustomBrandWrap').style.display='none';
+  document.getElementById('fmTitle').value='';
+  document.getElementById('fmDesc').value='';
+  document.getElementById('fmPreview').style.display='none';
+  document.getElementById('fmPreview').innerHTML='';
+  document.getElementById('fmDropzone').style.display='block';
+  document.getElementById('ovFile').classList.add('show');
+}
+
+function editCatalog(id){
+  const data=getData('catalog');
+  const item=data.find(d=>d.id===id);
+  if(!item)return;
+  fileMode='catalog';editId=id;
+  fmFileData=item.fileData;fmFileType=item.type;
+  document.getElementById('fileModalTitle').textContent='Edit Katalog';
+  document.getElementById('fmBrand').value=item.brand||'';
+  document.getElementById('fmTitle').value=item.title||'';
+  document.getElementById('fmDesc').value=item.desc||'';
+  document.getElementById('fmCustomBrandWrap').style.display='none';
+  // Show existing file preview
+  const prev=document.getElementById('fmPreview');
+  if(item.type==='pdf'){
+    prev.innerHTML=`<div class="file-preview"><div style="font-size:1.8rem">📄</div><div class="fp-info"><div class="fp-name">${esc(item.title)}</div><div class="fp-size">PDF File</div></div><button class="fp-del" onclick="clearFmFile()">✕</button></div>`;
+  } else {
+    prev.innerHTML=`<div class="file-preview"><img class="fp-thumb" src="${item.fileData}"><div class="fp-info"><div class="fp-name">${esc(item.title)}</div></div><button class="fp-del" onclick="clearFmFile()">✕</button></div>`;
+  }
+  prev.style.display='block';
+  document.getElementById('fmDropzone').style.display='none';
+  document.getElementById('ovFile').classList.add('show');
+}
+
+function openAddPricelist(){
+  fileMode='pricelist';
+  editId=null;fmFileData=null;fmFileType=null;
+  document.getElementById('fileModalTitle').textContent='Tambah Pricelist';
+  document.getElementById('fmBrand').value='';
+  document.getElementById('fmCustomBrand').value='';
+  document.getElementById('fmCustomBrandWrap').style.display='none';
+  document.getElementById('fmTitle').value='';
+  document.getElementById('fmDesc').value='';
+  document.getElementById('fmPreview').style.display='none';
+  document.getElementById('fmPreview').innerHTML='';
+  document.getElementById('fmDropzone').style.display='block';
+  document.getElementById('ovFile').classList.add('show');
+}
+
+function editPricelist(id){
+  const data=getData('pricelist');
+  const item=data.find(d=>d.id===id);
+  if(!item)return;
+  fileMode='pricelist';editId=id;
+  fmFileData=item.fileData;fmFileType=item.type;
+  document.getElementById('fileModalTitle').textContent='Edit Pricelist';
+  document.getElementById('fmBrand').value=item.brand||'';
+  document.getElementById('fmTitle').value=item.title||'';
+  document.getElementById('fmDesc').value=item.desc||'';
+  document.getElementById('fmCustomBrandWrap').style.display='none';
+  const prev=document.getElementById('fmPreview');
+  if(item.type==='pdf'){
+    prev.innerHTML=`<div class="file-preview"><div style="font-size:1.8rem">📄</div><div class="fp-info"><div class="fp-name">${esc(item.title)}</div><div class="fp-size">PDF File</div></div><button class="fp-del" onclick="clearFmFile()">✕</button></div>`;
+  } else {
+    prev.innerHTML=`<div class="file-preview"><img class="fp-thumb" src="${item.fileData}"><div class="fp-info"><div class="fp-name">${esc(item.title)}</div></div><button class="fp-del" onclick="clearFmFile()">✕</button></div>`;
+  }
+  prev.style.display='block';
+  document.getElementById('fmDropzone').style.display='none';
+  document.getElementById('ovFile').classList.add('show');
+}
+
+function fmBrandChange(){
+  const v=document.getElementById('fmBrand').value;
+  document.getElementById('fmCustomBrandWrap').style.display=v==='__custom__'?'block':'none';
+}
+
+function clearFmFile(){
+  fmFileData=null;fmFileType=null;
+  document.getElementById('fmPreview').style.display='none';
+  document.getElementById('fmDropzone').style.display='block';
+}
+
+function saveFile(){
+  const brandSel=document.getElementById('fmBrand').value;
+  const brand=brandSel==='__custom__'?document.getElementById('fmCustomBrand').value.trim():brandSel;
+  const title=document.getElementById('fmTitle').value.trim();
+  if(!brand){toast('⚠️ Pilih brand!','danger');return}
+  if(!title){toast('⚠️ Judul wajib diisi!','danger');return}
+  if(!fmFileData){toast('⚠️ Upload file terlebih dahulu!','danger');return}
+  const data=getData(fileMode);
+  const obj={
+    id:editId||uid(),brand,title,
+    desc:document.getElementById('fmDesc').value.trim(),
+    type:fmFileType,fileData:fmFileData,date:today(),
+  };
+  if(editId){const i=data.findIndex(d=>d.id===editId);data[i]=obj}
+  else data.unshift(obj);
+  saveData(fileMode,data);
+  co('ovFile');renderAll();
+  toast('✅ Data berhasil disimpan!','success');
+}
+
+// ── GALLERY ADD/EDIT ──
+function openAddGallery(){
+  editId=null;galImages=[];
+  document.getElementById('galModalTitle').textContent='Tambah Galeri Mobil';
+  document.getElementById('gmBrand').value='';
+  document.getElementById('gmCustomBrand').value='';
+  document.getElementById('gmCustomBrandWrap').style.display='none';
+  document.getElementById('gmModel').value='';
+  document.getElementById('gmType').value='';
+  document.getElementById('gmColor').value='';
+  renderImgSlots();
+  document.getElementById('ovGal').classList.add('show');
+}
+
+function editGallery(id){
+  const data=getData('gallery');
+  const item=data.find(d=>d.id===id);
+  if(!item)return;
+  editId=id;galImages=JSON.parse(JSON.stringify(item.images||[]));
+  document.getElementById('galModalTitle').textContent='Edit Galeri Mobil';
+  document.getElementById('gmBrand').value=item.brand||'';
+  document.getElementById('gmModel').value=item.model||'';
+  document.getElementById('gmType').value=item.type||'';
+  document.getElementById('gmColor').value=item.color||'';
+  document.getElementById('gmCustomBrandWrap').style.display='none';
+  renderImgSlots();
+  document.getElementById('ovGal').classList.add('show');
+}
+
+function gmBrandChange(){
+  const v=document.getElementById('gmBrand').value;
+  document.getElementById('gmCustomBrandWrap').style.display=v==='__custom__'?'block':'none';
+}
+
+function renderImgSlots(){
+  const slots=document.getElementById('gmSlots');
+  const imgs=galImages;
+  let html=imgs.map((img,i)=>`
+    <div class="img-slot">
+      <img src="${img.data}" alt="foto ${i+1}">
+      <button class="del-img" onclick="delGalImg(${i})">✕</button>
+    </div>`).join('');
+  html+=`<div class="img-slot add-btn" onclick="document.getElementById('gmFileInput').click()">
+    <span style="font-size:1.5rem">＋</span><span>Tambah Foto</span>
+  </div>`;
+  slots.innerHTML=html;
+}
+
+function handleGalleryImages(e){
+  const files=Array.from(e.target.files);
+  let processed=0;
+  files.forEach(file=>{
+    if(!file.type.startsWith('image/'))return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      galImages.push({data:ev.target.result,name:file.name});
+      processed++;
+      if(processed===files.length) renderImgSlots();
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value='';
+}
+
+function delGalImg(i){
+  galImages.splice(i,1);renderImgSlots();
+}
+
+function saveGallery(){
+  const brandSel=document.getElementById('gmBrand').value;
+  const brand=brandSel==='__custom__'?document.getElementById('gmCustomBrand').value.trim():brandSel;
+  const model=document.getElementById('gmModel').value.trim();
+  if(!brand){toast('⚠️ Pilih brand!','danger');return}
+  if(!model){toast('⚠️ Nama model wajib diisi!','danger');return}
+  const data=getData('gallery');
+  const obj={
+    id:editId||uid(),brand,model,
+    type:document.getElementById('gmType').value.trim()||'Standard',
+    color:document.getElementById('gmColor').value.trim()||'',
+    images:galImages,date:today(),
+  };
+  if(editId){const i=data.findIndex(d=>d.id===editId);data[i]=obj}
+  else data.unshift(obj);
+  saveData('gallery',data);
+  co('ovGal');renderAll();
+  toast('✅ Galeri berhasil disimpan!','success');
+}
+
+// ── PREVIEW ──
+function previewItem(id,type){
+  const data=getData(type);
+  const item=data.find(d=>d.id===id);
+  if(!item)return;
+  document.getElementById('prevTitle').textContent=item.title+' — '+item.brand;
+  let body='';
+  if(item.type==='pdf'){
+    body=`<embed src="${item.fileData}" type="application/pdf" style="width:100%;height:65vh;border-radius:8px">
+    <p style="font-size:.75rem;color:var(--muted);text-align:center;margin-top:8px">Jika PDF tidak tampil, browser tidak mendukung embed PDF.</p>`;
+  } else {
+    body=`<div style="text-align:center"><img src="${item.fileData}" style="max-width:100%;max-height:70vh;border-radius:10px;object-fit:contain"></div>`;
+  }
+  document.getElementById('prevBody').innerHTML=body;
+  document.getElementById('ovPreview').classList.add('show');
+}
+
+function previewGallery(id){
+  const data=getData('gallery');
+  const item=data.find(d=>d.id===id);
+  if(!item)return;
+  document.getElementById('prevTitle').textContent=item.brand+' '+item.model+' — '+(item.type||'Standard');
+  const imgs=item.images||[];
+  let body=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px">
+    ${imgs.map((im,i)=>`<img src="${im.data}" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;cursor:pointer" onclick="fullImg('${encodeURIComponent(im.data)}')">`).join('')}
+  </div>`;
+  if(!imgs.length) body='<p style="color:var(--muted);text-align:center;padding:20px">Belum ada foto.</p>';
+  document.getElementById('prevBody').innerHTML=body;
+  document.getElementById('ovPreview').classList.add('show');
+}
+
+function fullImg(encoded){
+  const src=decodeURIComponent(encoded);
+  window.open(src,'_blank');
+}
+
+// ── FILE HANDLING ──
+function handleFile(inputId,dzId,prevId){
+  const file=document.getElementById(inputId).files[0];
+  if(!file) return;
+  if(file.size>15*1024*1024){toast('⚠️ File terlalu besar (maks 15MB)!','danger');return}
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    fmFileData=ev.target.result;
+    fmFileType=file.type==='application/pdf'?'pdf':'img';
+    const prev=document.getElementById(prevId);
+    if(fmFileType==='pdf'){
+      prev.innerHTML=`<div class="file-preview"><div style="font-size:1.8rem">📄</div><div class="fp-info"><div class="fp-name">${esc(file.name)}</div><div class="fp-size">${(file.size/1024).toFixed(0)} KB</div></div><button class="fp-del" onclick="clearFmFile()">✕</button></div>`;
+    } else {
+      prev.innerHTML=`<div class="file-preview"><img class="fp-thumb" src="${ev.target.result}"><div class="fp-info"><div class="fp-name">${esc(file.name)}</div><div class="fp-size">${(file.size/1024).toFixed(0)} KB</div></div><button class="fp-del" onclick="clearFmFile()">✕</button></div>`;
+    }
+    prev.style.display='block';
+    document.getElementById(dzId).style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+// Drag & drop
+function dzDrag(e,id){e.preventDefault();document.getElementById(id).classList.add('drag')}
+function dzLeave(id){document.getElementById(id).classList.remove('drag')}
+function dzDrop(e,inputId,dzId){
+  e.preventDefault();document.getElementById(dzId).classList.remove('drag');
+  const file=e.dataTransfer.files[0];
+  if(!file)return;
+  const input=document.getElementById(inputId);
+  const dt=new DataTransfer();dt.items.add(file);input.files=dt.files;
+  handleFile(inputId,dzId,'fmPreview');
+}
+
+// ── MODAL HELPERS ──
+function co(id){document.getElementById(id).classList.remove('show')}
+function obg(e,id){if(e.target===document.getElementById(id))co(id)}
+
+// ── TOAST ──
+let tt;
+function toast(msg,type='success'){const e=document.getElementById('toast');e.textContent=msg;e.className='toast show '+type;clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('show'),2800)}
+
+// ── INIT ──
+renderAll();
+</script>
+<script>
+(function(){
+  var s=document.getElementById('mainjs').textContent;
+  var el=document.createElement('script');
+  el.textContent=s;
+  document.head.appendChild(el);
+})();
+</script>
+</body>
+</html>

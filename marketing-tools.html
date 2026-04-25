@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketing Tools — Wuling CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0c10;--surface:#111318;--surface2:#181c26;--surface3:#1e2230;
+  --border:#22273a;--border2:#2a3048;
+  --accent:#c8102e;--accent2:#e8a44a;--accent3:#5b8dee;
+  --text:#e8eaf0;--muted:#6b7280;
+  --success:#4ec97b;--warn:#f0b429;--danger:#e05c5c;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(200,16,46,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(200,16,46,.03) 1px,transparent 1px);background-size:52px 52px;pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:0 16px}
+
+/* HEADER */
+header{border-bottom:1px solid var(--border);padding:12px 0;backdrop-filter:blur(14px);background:rgba(10,12,16,.9);position:sticky;top:0;z-index:100}
+.hi{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.bl{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#a0001e);display:grid;place-items:center;font-size:14px}
+.brand h1{font-family:'DM Serif Display',serif;font-size:1.15rem}
+.brand span{color:var(--muted);font-size:.7rem;display:block}
+.ha{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.btn{padding:8px 14px;border-radius:8px;font-size:.79rem;font-weight:600;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .16s;white-space:nowrap;font-family:inherit}
+.btn-p{background:linear-gradient(135deg,var(--accent),#a0001e);color:#fff}.btn-p:hover{opacity:.88}
+.btn-g{background:var(--surface);border:1px solid var(--border);color:var(--text)}.btn-g:hover{border-color:var(--accent2)}
+.btn-sm{padding:6px 11px;font-size:.75rem}
+
+/* MAIN TABS */
+.main-nav{display:flex;gap:4px;padding:14px 0 0;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.main-nav::-webkit-scrollbar{height:0}
+.mnav{padding:9px 18px;font-size:.83rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .18s;white-space:nowrap;border-radius:4px 4px 0 0;flex-shrink:0}
+.mnav:hover{color:var(--text)}
+.mnav.active{color:var(--accent2);border-bottom-color:var(--accent2);background:rgba(232,164,74,.06)}
+
+/* BRAND FILTER */
+.brand-filter{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+.bf-label{font-size:.75rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0}
+.bfopt{padding:6px 14px;border-radius:20px;font-size:.76rem;font-weight:600;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;transition:all .16s;color:var(--muted);display:flex;align-items:center;gap:5px}
+.bfopt:hover{border-color:var(--accent2);color:var(--text)}
+.bfopt.active{border-color:var(--accent2);background:rgba(232,164,74,.12);color:var(--accent2)}
+.bico{width:20px;height:20px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:800;flex-shrink:0}
+.blog-wuling{background:linear-gradient(135deg,#c8102e,#8b0018);color:#fff}
+.blog-mg{background:linear-gradient(135deg,#cc0000,#880000);color:#fff}
+.blog-geely{background:linear-gradient(135deg,#003087,#001a5c);color:#fff}
+.blog-hyundai{background:linear-gradient(135deg,#002c5f,#001830);color:#c8a951}
+.blog-mazda{background:linear-gradient(135deg,#1a1a1a,#555);color:#fff}
+.blog-jetour{background:linear-gradient(135deg,#00923f,#005c27);color:#fff}
+.blog-gwm{background:linear-gradient(135deg,#e30613,#9e0000);color:#fff}
+
+/* CONTENT GRID */
+.content-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:transform .2s,border-color .2s;cursor:pointer}
+.card:hover{transform:translateY(-3px);border-color:var(--accent2)}
+.card-thumb{width:100%;height:160px;background:var(--surface2);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.card-thumb img{width:100%;height:100%;object-fit:cover}
+.card-thumb.pdf-thumb{background:linear-gradient(135deg,var(--surface2),var(--surface3))}
+.pdf-icon{font-size:3rem;opacity:.6}
+.card-thumb .brand-tag{position:absolute;top:8px;left:8px;padding:3px 8px;border-radius:5px;font-size:.66rem;font-weight:700;backdrop-filter:blur(4px)}
+.card-body{padding:14px}
+.card-title{font-weight:600;font-size:.9rem;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-sub{font-size:.75rem;color:var(--muted)}
+.card-actions{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
+.ca-btn{flex:1;padding:7px;border-radius:7px;font-size:.74rem;font-weight:600;border:1px solid var(--border);background:none;cursor:pointer;color:var(--muted);transition:all .14s;font-family:inherit;text-align:center}
+.ca-btn:hover.view{border-color:var(--accent3);color:var(--accent3);background:rgba(91,141,238,.1)}
+.ca-btn:hover.dl{border-color:var(--success);color:var(--success);background:rgba(78,201,123,.1)}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:64px 20px;color:var(--muted)}
+.empty-state .ic{font-size:3rem;margin-bottom:12px}
+.empty-state h3{font-size:1.05rem;color:var(--text);margin-bottom:6px}
+.empty-state p{font-size:.85rem}
+
+/* 360 VIEWER */
+.viewer-360{position:relative;width:100%;background:var(--surface2);border-radius:12px;overflow:hidden;user-select:none}
+.viewer-360 img{width:100%;height:auto;display:block;pointer-events:none}
+.viewer-360-ctrl{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 12px}
+.v360-btn{width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);color:#fff;cursor:pointer;font-size:1.1rem;display:grid;place-items:center;backdrop-filter:blur(4px);transition:background .15s}
+.v360-btn:hover{background:rgba(200,16,46,.6)}
+.v360-indicator{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:3px}
+.v360-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.3)}
+.v360-dot.active{background:var(--accent2)}
+.v360-hint{position:absolute;top:10px;right:10px;font-size:.68rem;background:rgba(0,0,0,.5);padding:3px 8px;border-radius:4px;color:rgba(255,255,255,.7);pointer-events:none}
+.color-swatches{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.swatch:hover{transform:scale(1.15)}
+.swatch.active{border-color:var(--accent2);transform:scale(1.15)}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
+.overlay.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:880px;padding:0;overflow:hidden;animation:su .22s ease;margin:auto;max-height:92vh;display:flex;flex-direction:column}
+@keyframes su{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);flex-shrink:0}
+.modal-ttl{font-family:'DM Serif Display',serif;font-size:1.2rem}
+.modal-body{padding:22px;overflow-y:auto;flex:1}
+.mclose{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-size:.9rem;transition:all .15s}
+.mclose:hover{color:var(--danger);border-color:var(--danger)}
+
+/* PDF VIEWER */
+.pdf-viewer-wrap{width:100%;border-radius:10px;overflow:hidden;background:#333}
+.pdf-viewer-wrap embed{width:100%;height:70vh;border:none}
+.img-viewer{width:100%;border-radius:10px;overflow:hidden;background:var(--surface2);display:flex;align-items:center;justify-content:center;min-height:300px}
+.img-viewer img{max-width:100%;max-height:75vh;object-fit:contain}
+
+/* GALLERY DETAIL */
+.gal-detail{display:grid;grid-template-columns:1fr 340px;gap:20px}
+.gal-detail-left{}
+.gal-detail-right{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px}
+.gd-label{font-size:.7rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.type-list{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto}
+.type-item{padding:8px 12px;border-radius:7px;background:var(--surface);border:1px solid var(--border);font-size:.82rem;cursor:pointer;transition:all .14s}
+.type-item:hover,.type-item.active{border-color:var(--accent2);background:rgba(232,164,74,.08);color:var(--accent2)}
+
+/* TOAST */
+.toast{position:fixed;bottom:18px;right:18px;z-index:300;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 16px;font-size:.82rem;display:flex;align-items:center;gap:7px;transform:translateY(70px);opacity:0;transition:all .28s ease;box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:var(--success)}.toast.danger{border-color:var(--danger)}
+
+@media(max-width:780px){
+  .content-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  .card-thumb{height:120px}
+  .gal-detail{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header>
+<div class="wrap hi">
+  <div class="brand">
+    <div class="bl">🎯</div>
+    <div><h1>Marketing Tools</h1><span id="dealerName">Wuling CRM</span></div>
+  </div>
+  <div class="ha">
+    <button class="btn btn-g" onclick="window.location='customer-database.html'">← CRM</button>
+    <button class="btn btn-g" onclick="window.location='admin-marketing.html'">⚙️ Admin</button>
+    <div style="display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:.78rem">
+      <div id="uAvatar" style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));display:grid;place-items:center;font-size:.65rem;font-weight:700;color:#000">?</div>
+      <span id="uName">Sales</span>
+    </div>
+  </div>
+</div>
+</header>
+
+<div class="wrap">
+<div class="main-nav">
+  <div class="mnav active" onclick="setTab('catalog',this)">📋 Katalog</div>
+  <div class="mnav" onclick="setTab('gallery',this)">🚗 Galeri Mobil</div>
+  <div class="mnav" onclick="setTab('pricelist',this)">💰 Pricelist</div>
+</div>
+
+<!-- CATALOG TAB -->
+<div id="tab-catalog">
+  <div class="brand-filter">
+    <span class="bf-label">Brand:</span>
+    <div class="bfopt active" data-brand="all" onclick="filterBrand('all','catalog',this)">🌐 Semua</div>
+    <div class="bfopt" data-brand="Wuling" onclick="filterBrand('Wuling','catalog',this)"><span class="bico blog-wuling">WL</span>Wuling</div>
+    <div class="bfopt" data-brand="MG" onclick="filterBrand('MG','catalog',this)"><span class="bico blog-mg">MG</span>MG</div>
+    <div class="bfopt" data-brand="Geely" onclick="filterBrand('Geely','catalog',this)"><span class="bico blog-geely">GL</span>Geely</div>
+    <div class="bfopt" data-brand="Hyundai" onclick="filterBrand('Hyundai','catalog',this)"><span class="bico blog-hyundai">HY</span>Hyundai</div>
+    <div class="bfopt" data-brand="Mazda" onclick="filterBrand('Mazda','catalog',this)"><span class="bico blog-mazda">MZ</span>Mazda</div>
+    <div class="bfopt" data-brand="Jetour" onclick="filterBrand('Jetour','catalog',this)"><span class="bico blog-jetour">JT</span>Jetour</div>
+    <div class="bfopt" data-brand="GWM" onclick="filterBrand('GWM','catalog',this)"><span class="bico blog-gwm">GW</span>GWM</div>
+  </div>
+  <div class="content-grid" id="catalogGrid"></div>
+  <div id="catalogEmpty" class="empty-state" style="display:none">
+    <div class="ic">📋</div>
+    <h3>Belum ada katalog</h3>
+    <p>Tambahkan katalog melalui halaman <a href="admin-marketing.html" style="color:var(--accent2)">Admin Marketing</a></p>
+  </div>
+</div>
+
+<!-- GALLERY TAB -->
+<div id="tab-gallery" style="display:none">
+  <div class="brand-filter">
+    <span class="bf-label">Brand:</span>
+    <div class="bfopt active" data-brand="all" onclick="filterBrand('all','gallery',this)">🌐 Semua</div>
+    <div class="bfopt" data-brand="Wuling" onclick="filterBrand('Wuling','gallery',this)"><span class="bico blog-wuling">WL</span>Wuling</div>
+    <div class="bfopt" data-brand="MG" onclick="filterBrand('MG','gallery',this)"><span class="bico blog-mg">MG</span>MG</div>
+    <div class="bfopt" data-brand="Geely" onclick="filterBrand('Geely','gallery',this)"><span class="bico blog-geely">GL</span>Geely</div>
+    <div class="bfopt" data-brand="Hyundai" onclick="filterBrand('Hyundai','gallery',this)"><span class="bico blog-hyundai">HY</span>Hyundai</div>
+    <div class="bfopt" data-brand="Mazda" onclick="filterBrand('Mazda','gallery',this)"><span class="bico blog-mazda">MZ</span>Mazda</div>
+    <div class="bfopt" data-brand="Jetour" onclick="filterBrand('Jetour','gallery',this)"><span class="bico blog-jetour">JT</span>Jetour</div>
+    <div class="bfopt" data-brand="GWM" onclick="filterBrand('GWM','gallery',this)"><span class="bico blog-gwm">GW</span>GWM</div>
+  </div>
+  <div class="content-grid" id="galleryGrid"></div>
+  <div id="galleryEmpty" class="empty-state" style="display:none">
+    <div class="ic">🚗</div>
+    <h3>Belum ada galeri</h3>
+    <p>Tambahkan galeri mobil melalui halaman <a href="admin-marketing.html" style="color:var(--accent2)">Admin Marketing</a></p>
+  </div>
+</div>
+
+<!-- PRICELIST TAB -->
+<div id="tab-pricelist" style="display:none">
+  <div class="brand-filter">
+    <span class="bf-label">Brand:</span>
+    <div class="bfopt active" data-brand="all" onclick="filterBrand('all','pricelist',this)">🌐 Semua</div>
+    <div class="bfopt" data-brand="Wuling" onclick="filterBrand('Wuling','pricelist',this)"><span class="bico blog-wuling">WL</span>Wuling</div>
+    <div class="bfopt" data-brand="MG" onclick="filterBrand('MG','pricelist',this)"><span class="bico blog-mg">MG</span>MG</div>
+    <div class="bfopt" data-brand="Geely" onclick="filterBrand('Geely','pricelist',this)"><span class="bico blog-geely">GL</span>Geely</div>
+    <div class="bfopt" data-brand="Hyundai" onclick="filterBrand('Hyundai','pricelist',this)"><span class="bico blog-hyundai">HY</span>Hyundai</div>
+    <div class="bfopt" data-brand="Mazda" onclick="filterBrand('Mazda','pricelist',this)"><span class="bico blog-mazda">MZ</span>Mazda</div>
+    <div class="bfopt" data-brand="Jetour" onclick="filterBrand('Jetour','pricelist',this)"><span class="bico blog-jetour">JT</span>Jetour</div>
+    <div class="bfopt" data-brand="GWM" onclick="filterBrand('GWM','pricelist',this)"><span class="bico blog-gwm">GW</span>GWM</div>
+  </div>
+  <div class="content-grid" id="pricelistGrid"></div>
+  <div id="pricelistEmpty" class="empty-state" style="display:none">
+    <div class="ic">💰</div>
+    <h3>Belum ada pricelist</h3>
+    <p>Tambahkan pricelist melalui halaman <a href="admin-marketing.html" style="color:var(--accent2)">Admin Marketing</a></p>
+  </div>
+</div>
+</div>
+
+<!-- VIEWER MODAL -->
+<div class="overlay" id="ovViewer" onclick="closeViewer(event)">
+<div class="modal" style="max-width:920px">
+  <div class="modal-hdr">
+    <div class="modal-ttl" id="viewerTitle">—</div>
+    <button class="mclose" onclick="document.getElementById('ovViewer').classList.remove('show')">✕</button>
+  </div>
+  <div class="modal-body" id="viewerBody"></div>
+</div>
+</div>
+
+<!-- GALLERY DETAIL MODAL -->
+<div class="overlay" id="ovGallery" onclick="closeGallery(event)">
+<div class="modal" style="max-width:960px">
+  <div class="modal-hdr">
+    <div class="modal-ttl" id="galleryTitle">—</div>
+    <button class="mclose" onclick="document.getElementById('ovGallery').classList.remove('show')">✕</button>
+  </div>
+  <div class="modal-body" id="galleryBody"></div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="text/plain" id="mainjs">
+// ── USER ──
+const USER = JSON.parse(localStorage.getItem('wuling_user')||'null');
+if(USER){
+  document.getElementById('uName').textContent=USER.name;
+  document.getElementById('uAvatar').textContent=USER.name.charAt(0).toUpperCase();
+  document.getElementById('dealerName').textContent=USER.dealer||'Wuling CRM';
+}
+
+// ── DATA from localStorage (set by admin page) ──
+function getData(key){ return JSON.parse(localStorage.getItem('mkt_'+key)||'[]') }
+
+// ── BRAND META ──
+const BRAND_META={
+  'Wuling':{cls:'blog-wuling',abbr:'WL',color:'#c8102e'},
+  'MG':{cls:'blog-mg',abbr:'MG',color:'#cc0000'},
+  'Geely':{cls:'blog-geely',abbr:'GL',color:'#003087'},
+  'Hyundai':{cls:'blog-hyundai',abbr:'HY',color:'#002c5f'},
+  'Mazda':{cls:'blog-mazda',abbr:'MZ',color:'#1a1a1a'},
+  'Jetour':{cls:'blog-jetour',abbr:'JT',color:'#00923f'},
+  'GWM':{cls:'blog-gwm',abbr:'GWM',color:'#e30613'},
+};
+
+function getBrandMeta(b){return BRAND_META[b]||{cls:'blog-custom',abbr:b?b.slice(0,2).toUpperCase():'?',color:'#6b7280'}}
+
+// ── TABS ──
+let curTab='catalog';
+let curFilters={catalog:'all',gallery:'all',pricelist:'all'};
+
+function setTab(tab,el){
+  curTab=tab;
+  document.querySelectorAll('.mnav').forEach(t=>t.classList.remove('active'));
+  if(el)el.classList.add('active');
+  ['catalog','gallery','pricelist'].forEach(t=>{
+    const el2=document.getElementById('tab-'+t);
+    if(el2)el2.style.display=t===tab?'block':'none';
+  });
+  renderTab(tab);
+}
+
+function filterBrand(brand,tab,el){
+  curFilters[tab]=brand;
+  // Update active button in correct tab
+  const tabEl=document.getElementById('tab-'+tab);
+  tabEl.querySelectorAll('.bfopt').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderTab(tab);
+}
+
+function renderTab(tab){
+  if(tab==='catalog') renderCatalog();
+  else if(tab==='gallery') renderGallery();
+  else if(tab==='pricelist') renderPricelist();
+}
+
+// ── CATALOG ──
+function renderCatalog(){
+  const data=getData('catalog');
+  const brand=curFilters.catalog;
+  const filtered=brand==='all'?data:data.filter(d=>d.brand===brand);
+  const grid=document.getElementById('catalogGrid');
+  const empty=document.getElementById('catalogEmpty');
+  if(!filtered.length){grid.innerHTML='';empty.style.display='';return}
+  empty.style.display='none';
+  grid.innerHTML=filtered.map(item=>{
+    const m=getBrandMeta(item.brand);
+    const thumb=item.type==='pdf'
+      ?`<div class="card-thumb pdf-thumb"><div class="pdf-icon">📄</div><span class="brand-tag" style="background:${m.color}22;color:${m.color};border:1px solid ${m.color}44">${item.brand}</span></div>`
+      :`<div class="card-thumb"><img src="${item.fileData}" alt="${item.title}" onerror="this.src='';this.parentElement.innerHTML='<div class=pdf-icon>🖼️</div>'"><span class="brand-tag" style="background:${m.color}22;color:${m.color};border:1px solid ${m.color}44">${item.brand}</span></div>`;
+    return`<div class="card" onclick="viewFile('${item.id}','catalog')">
+      ${thumb}
+      <div class="card-body">
+        <div class="card-title">${esc(item.title)}</div>
+        <div class="card-sub">${item.brand} · ${item.type.toUpperCase()} · ${fdate(item.date)}</div>
+        <div class="card-actions">
+          <button class="ca-btn view" onclick="event.stopPropagation();viewFile('${item.id}','catalog')">👁 Lihat</button>
+          <button class="ca-btn dl" onclick="event.stopPropagation();downloadFile('${item.id}','catalog')">⬇ Unduh</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── GALLERY ──
+function renderGallery(){
+  const data=getData('gallery');
+  const brand=curFilters.gallery;
+  const filtered=brand==='all'?data:data.filter(d=>d.brand===brand);
+  const grid=document.getElementById('galleryGrid');
+  const empty=document.getElementById('galleryEmpty');
+  if(!filtered.length){grid.innerHTML='';empty.style.display='';return}
+  empty.style.display='none';
+  // Group by model
+  const byModel={};
+  filtered.forEach(item=>{
+    const key=item.brand+'-'+item.model;
+    if(!byModel[key]) byModel[key]={brand:item.brand,model:item.model,items:[],cover:null};
+    byModel[key].items.push(item);
+    if(!byModel[key].cover&&(item.images&&item.images.length)) byModel[key].cover=item.images[0].data;
+  });
+  grid.innerHTML=Object.values(byModel).map(group=>{
+    const m=getBrandMeta(group.brand);
+    const thumb=group.cover
+      ?`<img src="${group.cover}" alt="${group.model}" onerror="this.style.display='none'">`
+      :`<div style="font-size:3rem;opacity:.4">🚗</div>`;
+    return`<div class="card" onclick="openGallery('${group.brand}','${group.model}')">
+      <div class="card-thumb" style="background:var(--surface2);position:relative">
+        ${thumb}
+        <span class="brand-tag" style="background:${m.color}22;color:${m.color};border:1px solid ${m.color}44">${group.brand}</span>
+        ${group.items.length>1?`<span style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.6);padding:2px 7px;border-radius:4px;font-size:.68rem;color:#fff">${group.items.length} varian</span>`:''}
+      </div>
+      <div class="card-body">
+        <div class="card-title">${esc(group.model)}</div>
+        <div class="card-sub">${group.brand} · ${group.items.length} type/warna</div>
+        <div class="card-actions">
+          <button class="ca-btn view" onclick="event.stopPropagation();openGallery('${group.brand}','${group.model}')">🔍 Lihat Galeri</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── PRICELIST ──
+function renderPricelist(){
+  const data=getData('pricelist');
+  const brand=curFilters.pricelist;
+  const filtered=brand==='all'?data:data.filter(d=>d.brand===brand);
+  const grid=document.getElementById('pricelistGrid');
+  const empty=document.getElementById('pricelistEmpty');
+  if(!filtered.length){grid.innerHTML='';empty.style.display='';return}
+  empty.style.display='none';
+  grid.innerHTML=filtered.map(item=>{
+    const m=getBrandMeta(item.brand);
+    const thumb=item.type==='pdf'
+      ?`<div class="card-thumb pdf-thumb"><div class="pdf-icon">💰</div><span class="brand-tag" style="background:${m.color}22;color:${m.color};border:1px solid ${m.color}44">${item.brand}</span></div>`
+      :`<div class="card-thumb"><img src="${item.fileData}" alt="${item.title}" onerror="this.parentElement.innerHTML='<div style=font-size:2.5rem;opacity:.5>💰</div>'"><span class="brand-tag" style="background:${m.color}22;color:${m.color};border:1px solid ${m.color}44">${item.brand}</span></div>`;
+    return`<div class="card" onclick="viewFile('${item.id}','pricelist')">
+      ${thumb}
+      <div class="card-body">
+        <div class="card-title">${esc(item.title)}</div>
+        <div class="card-sub">${item.brand} · ${item.type.toUpperCase()} · ${fdate(item.date)}</div>
+        <div class="card-actions">
+          <button class="ca-btn view" onclick="event.stopPropagation();viewFile('${item.id}','pricelist')">👁 Lihat</button>
+          <button class="ca-btn dl" onclick="event.stopPropagation();downloadFile('${item.id}','pricelist')">⬇ Unduh</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── VIEW FILE ──
+function viewFile(id,type){
+  const data=getData(type);
+  const item=data.find(d=>d.id===id);
+  if(!item) return;
+  document.getElementById('viewerTitle').textContent=item.title+' — '+item.brand;
+  let body='';
+  if(item.type==='pdf'){
+    body=`<div class="pdf-viewer-wrap"><embed src="${item.fileData}" type="application/pdf"></div>
+    <p style="font-size:.78rem;color:var(--muted);margin-top:10px;text-align:center">Jika PDF tidak tampil, gunakan tombol Unduh di bawah.</p>
+    <div style="text-align:center;margin-top:10px"><button class="btn btn-g" onclick="downloadFile('${id}','${type}')">⬇ Unduh PDF</button></div>`;
+  } else {
+    body=`<div class="img-viewer"><img src="${item.fileData}" alt="${item.title}"></div>
+    <div style="text-align:center;margin-top:12px"><button class="btn btn-g" onclick="downloadFile('${id}','${type}')">⬇ Unduh Gambar</button></div>`;
+  }
+  document.getElementById('viewerBody').innerHTML=body;
+  document.getElementById('ovViewer').classList.add('show');
+}
+
+function downloadFile(id,type){
+  const data=getData(type);
+  const item=data.find(d=>d.id===id);
+  if(!item) return;
+  const a=document.createElement('a');
+  a.href=item.fileData;
+  a.download=item.title+(item.type==='pdf'?'.pdf':'.jpg');
+  a.click();
+}
+
+function closeViewer(e){if(e.target===document.getElementById('ovViewer'))document.getElementById('ovViewer').classList.remove('show')}
+
+// ── GALLERY MODAL ──
+let cur360={images:[],idx:0,dragging:false,startX:0};
+
+function openGallery(brand,model){
+  const data=getData('gallery');
+  const items=data.filter(d=>d.brand===brand&&d.model===model);
+  if(!items.length) return;
+  document.getElementById('galleryTitle').textContent=brand+' '+model;
+  const m=getBrandMeta(brand);
+  // Build gallery detail
+  let body=`<div class="gal-detail">
+    <div class="gal-detail-left" id="galLeft">
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:12px">Pilih varian dari daftar kanan untuk melihat galeri & 360°</p>
+    </div>
+    <div class="gal-detail-right">
+      <div class="gd-label">Type / Varian</div>
+      <div class="type-list">
+        ${items.map((item,i)=>`<div class="type-item ${i===0?'active':''}" onclick="selectVariant('${item.id}',this)">${esc(item.type||'Standard')} — ${esc(item.color||'Default')}</div>`).join('')}
+      </div>
+      <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px">
+        <div class="gd-label">Warna Tersedia</div>
+        <div class="color-swatches" id="colorSwatches"></div>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('galleryBody').innerHTML=body;
+  // Auto-select first
+  if(items.length) selectVariantById(items[0].id);
+  document.getElementById('ovGallery').classList.add('show');
+}
+
+function selectVariant(id,el){
+  document.querySelectorAll('.type-item').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  selectVariantById(id);
+}
+
+function selectVariantById(id){
+  const data=getData('gallery');
+  const item=data.find(d=>d.id===id);
+  if(!item) return;
+  const images=item.images||[];
+  cur360={images,idx:0,dragging:false,startX:0};
+  const left=document.getElementById('galLeft');
+  if(!images.length){
+    left.innerHTML=`<div class="empty-state" style="padding:30px"><div class="ic">🖼️</div><p>Belum ada foto untuk varian ini</p></div>`;
+    return;
+  }
+  left.innerHTML=build360Viewer(images,item.type,item.color);
+  // Color swatches
+  const swatches=document.getElementById('colorSwatches');
+  const swatch=colorHex(item.color||'');
+  if(swatches) swatches.innerHTML=`<div class="swatch active" style="background:${swatch}" title="${item.color||'Default'}"></div>`;
+  // Bind drag events
+  bind360Events();
+}
+
+function build360Viewer(images,type,color){
+  const idx=cur360.idx;
+  const img=images[idx]?.data||'';
+  const dots=images.map((im,i)=>`<div class="v360-dot ${i===idx?'active':''}"></div>`).join('');
+  return`<div class="viewer-360" id="v360" style="min-height:220px">
+    ${img?`<img src="${img}" alt="360 view" id="v360img">`:`<div style="height:280px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.85rem">Tidak ada gambar</div>`}
+    <div class="viewer-360-ctrl">
+      <button class="v360-btn" onclick="rotate360(-1)">‹</button>
+      <button class="v360-btn" onclick="rotate360(1)">›</button>
+    </div>
+    ${images.length>1?`<div class="v360-indicator">${dots}</div><div class="v360-hint">Geser atau tekan ‹ › untuk putar</div>`:''}
+  </div>
+  <div style="margin-top:8px;font-size:.8rem;color:var(--muted)">
+    <strong style="color:var(--text)">${esc(type||'Standard')}</strong>${color?' · Warna: '+esc(color):''}
+    ${images.length>1?` · Foto ${idx+1}/${images.length}`:''}
+  </div>
+  <div style="margin-top:12px;display:flex;gap:6px;overflow-x:auto;padding-bottom:4px" id="thumbRow">
+    ${images.map((im,i)=>`<img src="${im.data}" style="width:56px;height:42px;border-radius:6px;object-fit:cover;cursor:pointer;border:2px solid ${i===idx?'var(--accent2)':'var(--border)'};flex-shrink:0" onclick="jumpTo360(${i})">`).join('')}
+  </div>`;
+}
+
+function rotate360(dir){
+  const n=cur360.images.length;
+  if(!n) return;
+  cur360.idx=(cur360.idx+dir+n)%n;
+  refresh360();
+}
+
+function jumpTo360(i){
+  cur360.idx=i;
+  refresh360();
+}
+
+function refresh360(){
+  const left=document.getElementById('galLeft');
+  const item=getSelectedVariant();
+  if(item) left.innerHTML=build360Viewer(cur360.images,item.type,item.color);
+  bind360Events();
+}
+
+function getSelectedVariant(){
+  const activeType=document.querySelector('.type-item.active');
+  if(!activeType) return null;
+  const data=getData('gallery');
+  // find by text match
+  return data.find(d=>{
+    const label=(d.type||'Standard')+' — '+(d.color||'Default');
+    return activeType.textContent.trim()===label;
+  });
+}
+
+function bind360Events(){
+  const el=document.getElementById('v360');
+  if(!el) return;
+  el.addEventListener('mousedown',e=>{cur360.dragging=true;cur360.startX=e.clientX},{once:false});
+  el.addEventListener('mousemove',e=>{
+    if(!cur360.dragging) return;
+    const diff=e.clientX-cur360.startX;
+    if(Math.abs(diff)>30){rotate360(diff>0?-1:1);cur360.startX=e.clientX}
+  });
+  el.addEventListener('mouseup',()=>cur360.dragging=false);
+  el.addEventListener('touchstart',e=>{cur360.startX=e.touches[0].clientX},{passive:true});
+  el.addEventListener('touchmove',e=>{
+    const diff=e.touches[0].clientX-cur360.startX;
+    if(Math.abs(diff)>30){rotate360(diff>0?-1:1);cur360.startX=e.touches[0].clientX}
+  },{passive:true});
+}
+
+function colorHex(name){
+  const m={'putih':'#f5f5f5','hitam':'#1a1a1a','merah':'#c8102e','biru':'#003087','abu':'#9ca3af','silver':'#c0c0c0','hijau':'#00923f','kuning':'#f0b429','orange':'#ea580c','coklat':'#78350f','gold':'#b7860b'};
+  const low=name.toLowerCase();
+  for(const [k,v] of Object.entries(m)) if(low.includes(k)) return v;
+  return '#6b7280';
+}
+
+function closeGallery(e){if(e.target===document.getElementById('ovGallery'))document.getElementById('ovGallery').classList.remove('show')}
+
+// ── HELPERS ──
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function fdate(d){if(!d)return'—';const[y,m,dy]=d.split('-');const M=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];return`${dy} ${M[+m-1]} ${y}`}
+
+let tt;
+function toast(msg,type='success'){const e=document.getElementById('toast');e.textContent=msg;e.className='toast show '+type;clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('show'),2800)}
+
+// ── INIT ──
+renderCatalog();
+</script>
+<script>
+(function(){
+  var s=document.getElementById('mainjs').textContent;
+  var el=document.createElement('script');
+  el.textContent=s;
+  document.head.appendChild(el);
+})();
+</script>
+</body>
+</html>
