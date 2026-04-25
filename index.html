@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="refresh" content="0; url=./customer-database.html">
+<title>Wuling CRM</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#0a0c10;color:#e8eaf0;min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.logo{width:72px;height:72px;border-radius:16px;background:linear-gradient(135deg,#c8102e,#a0001e);display:grid;place-items:center;font-size:32px;margin-bottom:8px}
+h1{font-size:1.6rem;font-weight:700}
+p{color:#6b7280;font-size:.9rem}
+.loader{width:40px;height:4px;background:#22273a;border-radius:2px;overflow:hidden;margin-top:8px}
+.loader-bar{height:100%;width:0;background:linear-gradient(90deg,#c8102e,#e8a44a);border-radius:2px;animation:load 1s ease forwards}
+@keyframes load{to{width:100%}}
+a{color:#e8a44a;font-size:.85rem;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="logo">🚗</div>
+<h1>Wuling CRM</h1>
+<p>Mengalihkan ke aplikasi...</p>
+<div class="loader"><div class="loader-bar"></div></div>
+<br>
+<a href="./customer-database.html">Klik di sini jika tidak otomatis →</a>
+<script>
+setTimeout(function(){
+  window.location.href='./customer-database.html';
+},800);
+</script>
+</body>
+</html>
